@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+import { DM_Sans } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
+
+const inter = localFont({
+  src: "./fonts/InterVF.ttf",
+  variable: "--font-inter",
+  weight: "100 200 300 400 500 700 800 900",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const spaceGrotesk = localFont({
+  src: "./fonts/SpaceGroteskVF.ttf",
+  variable: "--font-space-grotesk",
+  weight: "300 400 500 700",
 });
 
 export const metadata: Metadata = {
@@ -23,11 +29,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={dmSans.variable}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.className} ${spaceGrotesk.variable} antialiased`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );
