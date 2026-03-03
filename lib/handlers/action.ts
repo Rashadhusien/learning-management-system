@@ -27,7 +27,9 @@ async function action<T>({
           error.flatten().fieldErrors as Record<string, string[]>,
         );
       } else {
-        return new Error("Schema validation failed");
+        return new Error(
+          `Schema validation failed: ${(error as Error).message}`,
+        );
       }
     }
   }

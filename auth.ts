@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { db } from "@/lib/db";
-import { users } from "@/lib/schema";
+import { users, accounts } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -17,15 +17,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
+        // Find user by email
         const user = await db.query.users.findFirst({
           where: eq(users.email, credentials.email as string),
         });
 
-        if (!user || !user.password) return null;
+        if (!user) return null;
+
+        // Find associated account with password
+        const account = await db.query.accounts.findFirst({
+          where: eq(accounts.userId, user.id),
+        });
+
+        if (!account || !account.password) return null;
 
         const isValid = await bcrypt.compare(
           credentials.password as string,
-          user.password,
+          account.password,
         );
 
         if (!isValid) return null;

@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 
 import AuthForm from "@/components/forms/AuthForm";
 import { logInWithCredentails } from "@/lib/actions/auth.action";

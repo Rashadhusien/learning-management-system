@@ -12,6 +12,7 @@ CREATE TABLE "accounts" (
 	"scope" text,
 	"id_token" text,
 	"session_state" text,
+	"password" text,
 	CONSTRAINT "accounts_provider_provider_account_id_pk" PRIMARY KEY("provider","provider_account_id")
 );
 --> statement-breakpoint
@@ -79,9 +80,9 @@ CREATE TABLE "student_achievements" (
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
+	"username" text NOT NULL,
 	"email" text NOT NULL,
 	"email_verified" timestamp,
-	"password" text,
 	"image" text,
 	"role" "role" DEFAULT 'student' NOT NULL,
 	"bio" text,
@@ -91,6 +92,7 @@ CREATE TABLE "users" (
 	"is_deleted" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "users_username_unique" UNIQUE("username"),
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint

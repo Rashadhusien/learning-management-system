@@ -31,10 +31,9 @@ export const users = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
 
     name: text("name").notNull(),
+    username: text("username").unique().notNull(),
     email: text("email").unique().notNull(),
     emailVerified: timestamp("email_verified"),
-
-    password: text("password"), // only for credentials login
 
     image: text("image"),
 
@@ -76,6 +75,8 @@ export const accounts = pgTable(
     scope: text("scope"),
     id_token: text("id_token"),
     session_state: text("session_state"),
+
+    password: text("password"),
   },
   (account) => ({
     compoundKey: primaryKey({

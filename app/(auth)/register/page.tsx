@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 
 import AuthForm from "@/components/forms/AuthForm";
 import { RegisterSchema } from "@/lib/validations";
