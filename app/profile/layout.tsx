@@ -2,6 +2,7 @@ import { ROUTES } from "@/constants/routes";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import React from "react";
+import Navbar from "@/components/navigation/navbar";
 
 const StudentLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await auth();
@@ -11,7 +12,7 @@ const StudentLayout = async ({ children }: { children: React.ReactNode }) => {
   if (!session) redirect(ROUTES.LOGIN);
   return (
     <div>
-      <header>Student Header</header>
+      <Navbar />
       {children}
       <footer>Student Footer</footer>
     </div>

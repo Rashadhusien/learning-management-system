@@ -6,7 +6,7 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
     <div>
       <Navbar />
       {children}
-      <footer>Footer</footer>
+      {/* <footer>Footer</footer> */}
     </div>
   );
 };

@@ -1,20 +1,40 @@
-"use client";
+import { UserDropdown } from "@/components/UserDropdwon";
 import { ModeToggle } from "./mode-toggle";
-import { signOutAction } from "@/lib/actions/auth.action";
+import NavLinks from "./NavLinks";
+import Link from "next/link";
+import { ROUTES } from "@/constants/routes";
+import MobileNavigation from "./MobileNavigation";
+import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
 
-const Navbar = () => {
+const Navbar = async () => {
+  const session = await auth();
   return (
-    <nav>
-      Navbar
-      <ModeToggle />
-      <form action={signOutAction}>
-        <Button className="base-medium w-fit px-4 py-3 cursor-pointer">
-          <LogOut className="size-5 text-black dark:text-white" />
-          <span className="max-lg:hidden text-dark300_light900">Log out</span>
-        </Button>
-      </form>
+    <nav className="p-4 bg-background/50">
+      <div className="container mx-auto flex items-center justify-between md::justify-around">
+        <h1 className="text-3xl font-bold font-space-grotesk  text-primary">
+          <Link href={ROUTES.HOME}>Cody</Link>
+        </h1>
+        <div className="max-lg:hidden flex items-center gap-4 bg-background/30 px-4 rounded-full">
+          <NavLinks />
+        </div>
+        <div className="flex items-center gap-4 max-lg:hidden">
+          {session ? (
+            <UserDropdown />
+          ) : (
+            <Link href={ROUTES.LOGIN}>
+              <Button>log in</Button>
+            </Link>
+          )}
+          <ModeToggle />
+        </div>
+        <div className="flex items-center gap-2 lg:hidden">
+          <div className="lg:hidden">
+            <ModeToggle />
+          </div>
+          <MobileNavigation />
+        </div>
+      </div>
     </nav>
   );
 };

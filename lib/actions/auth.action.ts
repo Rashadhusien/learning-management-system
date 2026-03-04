@@ -10,6 +10,7 @@ import { signIn } from "@/auth";
 import { NotFoundError } from "../http-errors";
 
 import { signOut } from "@/auth";
+import { ROUTES } from "@/constants/routes";
 
 export const logInWithCredentails = async (
   params: Pick<AuthCredentails, "email" | "password">,
@@ -121,5 +122,5 @@ export const registerWithCredentails = async (params: AuthCredentails) => {
 };
 
 export async function signOutAction() {
-  await signOut();
+  await signOut({ redirectTo: ROUTES.LOGIN });
 }
