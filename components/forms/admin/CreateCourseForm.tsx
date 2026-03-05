@@ -3,11 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import type { Resolver } from "react-hook-form";
 import { createCourse } from "@/lib/actions/courses.action";
+import { getAllCategories } from "@/lib/actions/categories.action";
+import { Category } from "@/types/action.d";
 
 interface UploadWidgetValue {
   url: string;
@@ -48,6 +50,8 @@ type CreateCourseFormData = z.infer<typeof CreateCourseSchema> & {
 const CreateCourseForm = () => {
   const router = useRouter();
   const [bannerPublicId, setBannerPublicId] = useState<string>("");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
   const form = useForm<CreateCourseFormData>({
     resolver: zodResolver(CreateCourseSchema) as Resolver<CreateCourseFormData>,
@@ -57,12 +61,29 @@ const CreateCourseForm = () => {
       price: 1,
       duration: 1,
       level: "",
-      category: "",
+      categoryId: "",
       bannerUrl: "",
       bannerCldPubId: "",
       isPublished: false,
     },
   });
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const result = await getAllCategories();
+        if (result.success && result.data) {
+          setCategories(result.data);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (data: CreateCourseFormData) => {
     try {
@@ -83,7 +104,7 @@ const CreateCourseForm = () => {
         price: data.price,
         duration: data.duration,
         level: data.level,
-        category: data.category,
+        categoryId: data.categoryId,
         bannerUrl: data.bannerUrl,
         bannerCldPubId: data.bannerCldPubId,
         isPublished: data.isPublished,
@@ -318,21 +339,29 @@ const CreateCourseForm = () => {
               )}
             />
             <Controller
-              name="category"
+              name="categoryId"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="course-category">Category</FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={loadingCategories}
+                  >
                     <SelectTrigger id="course-category">
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue
+                        placeholder={
+                          loadingCategories ? "Loading..." : "Select category"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="programming">Programming</SelectItem>
-                      <SelectItem value="design">Design</SelectItem>
-                      <SelectItem value="business">Business</SelectItem>
-                      <SelectItem value="marketing">Marketing</SelectItem>
-                      <SelectItem value="data-science">Data Science</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   {fieldState.invalid && (

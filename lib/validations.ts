@@ -60,6 +60,25 @@ export const RegisterSchema = z.object({
     }),
 });
 
+export const CreateCategorySchema = z.object({
+  name: z
+    .string()
+    .min(1, { message: "Category name is required." })
+    .max(50, { message: "Category name cannot exceed 50 characters." }),
+  description: z.string().optional(),
+  icon: z.string().optional(),
+});
+
+export const UpdateCategorySchema = z.object({
+  name: z
+    .string()
+    .min(1, { message: "Category name is required." })
+    .max(50, { message: "Category name cannot exceed 50 characters." })
+    .optional(),
+  description: z.string().optional(),
+  icon: z.string().optional(),
+});
+
 export const CreateCourseSchema = z.object({
   title: z.string().min(1, { message: "Title is required." }),
   description: z.string().min(1, { message: "Description is required." }),
@@ -70,5 +89,5 @@ export const CreateCourseSchema = z.object({
     .number()
     .min(1, { message: "Duration must be a positive number." }),
   level: z.string().min(1, { message: "Level is required." }),
-  category: z.string().min(1, { message: "Category is required." }),
+  categoryId: z.string().min(1, { message: "Category is required." }),
 });

@@ -50,6 +50,11 @@ export const adminLinks = [
     label: "Dashboard",
   },
   {
+    imgUrl: "/icons/category.svg",
+    route: ROUTES.ADMIN_CATEGORIES,
+    label: "Categories",
+  },
+  {
     imgUrl: "/icons/courses.svg",
     route: ROUTES.ADMIN_COURSES,
     label: "Courses",

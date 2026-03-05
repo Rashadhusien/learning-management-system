@@ -1,142 +1,15 @@
-import React, from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Users, Clock, Star } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { getAllCourses } from "@/lib/actions/courses.action";
-
-
+import DataRenderer from "@/components/DataRenderer";
+import { EMYPTY_COURSE } from "@/constants/states";
+import { CoursesTableWrapper } from "@/components/tables/Admin/Courses/CoursesTableWrapper";
 
 const AdminCourses = async () => {
   const courses = await getAllCourses();
 
   console.log(courses);
-
-  // const [courses, setCourses] = useState<Course[]>([
-  //   {
-  //     id: "1",
-  //     title: "Complete Web Development Bootcamp",
-  //     description:
-  //       "Learn modern web development from scratch with React, Node.js, and more",
-  //     level: "Beginner",
-  //     duration: "12 weeks",
-  //     enrolledCount: 1250,
-  //     rating: 4.8,
-  //     status: "published",
-  //   },
-  //   {
-  //     id: "2",
-  //     title: "Advanced React & Next.js",
-  //     description:
-  //       "Master React patterns, performance optimization, and Next.js framework",
-  //     level: "Advanced",
-  //     duration: "8 weeks",
-  //     enrolledCount: 450,
-  //     rating: 4.9,
-  //     status: "published",
-  //   },
-  //   {
-  //     id: "3",
-  //     title: "Python for Data Science",
-  //     description:
-  //       "Complete Python programming with focus on data analysis and machine learning",
-  //     level: "Intermediate",
-  //     duration: "10 weeks",
-  //     enrolledCount: 890,
-  //     rating: 4.7,
-  //     status: "draft",
-  //   },
-  // ]);
-
-  // const [isDialogOpen, setIsDialogOpen] = useState(false);
-  // const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-  // const [formData, setFormData] = useState({
-  //   title: "",
-  //   description: "",
-  //   level: "",
-  //   duration: "",
-  //   status: "draft" as const,
-  // });
-
-  // const handleAddCourse = () => {
-  //   setEditingCourse(null);
-  //   setFormData({
-  //     title: "",
-  //     description: "",
-  //     level: "",
-  //     duration: "",
-  //     status: "draft",
-  //   });
-  //   setIsDialogOpen(true);
-  // };
-
-  // const handleEditCourse = (course: Course) => {
-  //   setEditingCourse(course);
-  //   setFormData({
-  //     title: course.title,
-  //     description: course.description,
-  //     level: course.level,
-  //     duration: course.duration,
-  //     status: course.status,
-  //   });
-  //   setIsDialogOpen(true);
-  // };
-
-  // const handleSaveCourse = () => {
-  //   if (editingCourse) {
-  //     // Update existing course
-  //     setCourses(
-  //       courses.map((course) =>
-  //         course.id === editingCourse.id ? { ...course, ...formData } : course,
-  //       ),
-  //     );
-  //   } else {
-  //     // Add new course
-  //     const newCourse: Course = {
-  //       id: Date.now().toString(),
-  //       ...formData,
-  //       enrolledCount: 0,
-  //       rating: 0,
-  //     };
-  //     setCourses([...courses, newCourse]);
-  //   }
-  //   setIsDialogOpen(false);
-  // };
-
-  // const handleDeleteCourse = (id: string) => {
-  //   setCourses(courses.filter((course) => course.id !== id));
-  // };
-
-  const getStatusColor = (status: Course["status"]) => {
-    switch (status) {
-      case "published":
-        return "bg-green-100 text-green-800";
-      case "draft":
-        return "bg-yellow-100 text-yellow-800";
-      case "archived":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   return (
     <div className="p-6 space-y-6">
@@ -147,10 +20,9 @@ const AdminCourses = async () => {
             Manage your courses, content, and student enrollment
           </p>
         </div>
-        {/* <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild> */}
+
         <Link href="/admin/courses/create">
-          <Button  className="flex items-center gap-2">
+          <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Add Course
           </Button>
@@ -231,61 +103,13 @@ const AdminCourses = async () => {
           </CardContent>
         </Card>
       </div> */}
-
-      {/* Courses List */}
-      {/* <div className="space-y-4">
-        {courses.map((course) => (
-          <Card key={course.id}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <CardTitle className="text-xl">{course.title}</CardTitle>
-                  <p className="text-muted-foreground">{course.description}</p>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      {course.enrolledCount.toLocaleString()} students
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {course.duration}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Star className="h-4 w-4" />
-                      {course.rating}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className={getStatusColor(course.status)}>
-                    {course.status}
-                  </Badge>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditCourse(course)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDeleteCourse(course.id)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary">{course.level}</Badge>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div> */}
+      <DataRenderer
+        success={courses.success}
+        error={courses.error}
+        data={courses.data}
+        empty={EMYPTY_COURSE}
+        render={(data) => <CoursesTableWrapper data={data} />}
+      />
     </div>
   );
 };

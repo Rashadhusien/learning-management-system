@@ -106,6 +106,16 @@ export const verificationTokens = pgTable(
   }),
 );
 
+export const categories = pgTable("categories", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").unique().notNull(),
+  description: text("description"),
+  icon: text("icon"), // icon name or URL
+  isDeleted: boolean("is_deleted").default(false).notNull(),
+
+  ...baseSchema,
+});
+
 export const courses = pgTable("courses", {
   id: uuid("id").defaultRandom().primaryKey(),
 
@@ -116,7 +126,9 @@ export const courses = pgTable("courses", {
   bannerUrl: text("banner_url").notNull(),
   duration: integer("duration").notNull(), // in hours
   level: text("level").notNull(),
-  category: text("category").notNull(),
+  categoryId: uuid("category_id")
+    .notNull()
+    .references(() => categories.id, { onDelete: "restrict" }),
   instructorId: text("instructor_id").notNull(),
   isDeleted: boolean("is_deleted").default(false).notNull(),
 

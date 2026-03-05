@@ -1,4 +1,4 @@
-interface SignInWithOAuthParams {
+export interface SignInWithOAuthParams {
   provider: "github" | "google";
   providerAccountId: string;
   user: {
@@ -9,32 +9,65 @@ interface SignInWithOAuthParams {
   };
 }
 
-interface AuthCredentails {
+export interface AuthCredentails {
   name: string;
   username: string;
   email: string;
   password: string;
 }
 
-interface CreateCourseParams {
+export interface CreateCourseParams {
   title: string;
   description: string;
   price: number;
   duration: number;
   level: string;
-  category: string;
+  categoryId: string;
   bannerUrl: string;
   bannerCldPubId?: string;
   isPublished: boolean;
 }
 
-interface Course {
+export interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateCategoryParams {
+  name: string;
+  description?: string;
+  icon?: string;
+}
+
+export interface UpdateCategoryParams {
+  name?: string;
+  description?: string;
+  icon?: string;
+}
+
+export interface Course {
   id: string;
   title: string;
   description: string;
+  price: number;
+  isPublished: boolean;
+  bannerUrl: string;
+  duration: number;
   level: string;
-  duration: string;
-  enrolledCount: number;
-  rating: number;
-  status: "published" | "draft" | "archived";
+  categoryId: string;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  instructorId: string;
+  category?: {
+    id: string;
+    name: string;
+    description?: string;
+    icon?: string;
+  };
 }
