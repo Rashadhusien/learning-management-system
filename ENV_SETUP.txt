@@ -1,0 +1,57 @@
+# Environment Variables Setup Guide
+
+## IMMEDIATE FIX - Create .env.local file
+
+Create a file named `.env.local` in the ROOT of your project (same level as package.json) and add these lines:
+
+```env
+CLOUDINARY_CLOUD_NAME=demo
+CLOUDINARY_UPLOAD_PRESET=preset1
+```
+
+## For Production - Get Your Own Cloudinary Account
+
+### Step 1: Create Cloudinary Account
+1. Go to https://cloudinary.com/
+2. Sign up for FREE account
+3. Verify your email
+
+### Step 2: Get Your Cloud Name
+1. After login, go to Dashboard
+2. Copy your "Cloud Name" (e.g., "abc123def")
+
+### Step 3: Create Upload Preset
+1. Go to Settings → Upload
+2. Click "Add upload preset"
+3. Name it anything (e.g., "course_uploads")
+4. Set "Signing mode" to "Unsigned"
+5. Click Save
+6. Copy the preset name
+
+### Step 4: Update .env.local
+Replace the demo values with your actual values:
+
+```env
+CLOUDINARY_CLOUD_NAME=your_actual_cloud_name
+CLOUDINARY_UPLOAD_PRESET=your_actual_preset_name
+```
+
+### Step 5: Restart Server
+IMPORTANT: After creating .env.local, you MUST restart your development server:
+
+```bash
+# Stop the current server (Ctrl+C)
+# Then restart:
+npm run dev
+```
+
+## Test the Upload
+1. Go to course creation form
+2. Click the upload widget
+3. The Cloudinary upload dialog should appear
+4. Select an image and upload
+
+## Troubleshooting
+- If still not working: Double-check .env.local file is in project ROOT
+- Make sure variable names match EXACTLY
+- Restart server after any changes to .env.local

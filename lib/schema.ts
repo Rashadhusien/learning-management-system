@@ -111,7 +111,13 @@ export const courses = pgTable("courses", {
 
   title: text("title").notNull(),
   description: text("description").notNull(),
-  image: text("image"),
+  price: integer("price").default(0).notNull(),
+  isPublished: boolean("is_published").default(false).notNull(),
+  bannerUrl: text("banner_url").notNull(),
+  duration: integer("duration").notNull(), // in hours
+  level: text("level").notNull(),
+  category: text("category").notNull(),
+  instructorId: text("instructor_id").notNull(),
   isDeleted: boolean("is_deleted").default(false).notNull(),
 
   ...baseSchema,

@@ -1,10 +1,11 @@
 import Navbar from "@/components/navigation/navbar";
 import React from "react";
 
-const PublicLayout = ({ children }: { children: React.ReactNode }) => {
+const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
   return (
-    <div>
+    <div className="relative">
       <Navbar />
+
       {children}
       {/* <footer>Footer</footer> */}
     </div>

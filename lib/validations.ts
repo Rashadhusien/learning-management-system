@@ -59,3 +59,16 @@ export const RegisterSchema = z.object({
       message: "Password must contain at least one special character.",
     }),
 });
+
+export const CreateCourseSchema = z.object({
+  title: z.string().min(1, { message: "Title is required." }),
+  description: z.string().min(1, { message: "Description is required." }),
+  price: z.number().min(1, { message: "Price must be a positive number." }),
+  isPublished: z.boolean().default(false),
+  bannerUrl: z.string().min(1, { message: "Banner URL is required." }),
+  duration: z
+    .number()
+    .min(1, { message: "Duration must be a positive number." }),
+  level: z.string().min(1, { message: "Level is required." }),
+  category: z.string().min(1, { message: "Category is required." }),
+});

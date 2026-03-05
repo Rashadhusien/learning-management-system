@@ -1,11 +1,26 @@
 import { ROUTES } from "./routes";
 
+export const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB in bytes
+export const ALLOWED_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+];
+
+const getEnvVar = (key: string): string | undefined => {
+  const value = process.env[key];
+  return value || undefined;
+};
+
+export const CLOUDINARY_CLOUD_NAME = getEnvVar(
+  "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME",
+);
+export const CLOUDINARY_UPLOAD_PRESET = getEnvVar(
+  "NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET",
+);
+
 export const sidebarLinks = [
-  {
-    // imgUrl: "/icons/home.svg",
-    route: ROUTES.HOME,
-    label: "Home",
-  },
   {
     route: ROUTES.COURSES,
     label: "Courses",

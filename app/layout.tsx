@@ -4,6 +4,7 @@ import "./globals.css";
 // import { DM_Sans } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import Script from "next/script";
 
 // const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -31,6 +32,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script
+          src="https://upload-widget.cloudinary.com/latest/global/all.js"
+          type="text/javascript"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body
         className={`${inter.className} ${spaceGrotesk.variable} antialiased`}
       >

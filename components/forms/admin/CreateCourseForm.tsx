@@ -1,0 +1,363 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
+import { useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+import type { Resolver } from "react-hook-form";
+import { createCourse } from "@/lib/actions/courses.action";
+
+interface UploadWidgetValue {
+  url: string;
+  publicId: string;
+  sizeBytes?: number;
+  mimeType?: string;
+}
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { InputGroup } from "@/components/ui/input-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { CreateCourseSchema } from "@/lib/validations";
+import { Textarea } from "@/components/ui/textarea";
+import ImageUploadWidget from "@/components/upload-widget";
+import { ROUTES } from "@/constants/routes";
+
+type CreateCourseFormData = z.infer<typeof CreateCourseSchema> & {
+  bannerCldPubId?: string;
+};
+
+const CreateCourseForm = () => {
+  const router = useRouter();
+  const [bannerPublicId, setBannerPublicId] = useState<string>("");
+
+  const form = useForm<CreateCourseFormData>({
+    resolver: zodResolver(CreateCourseSchema) as Resolver<CreateCourseFormData>,
+    defaultValues: {
+      title: "",
+      description: "",
+      price: 1,
+      duration: 1,
+      level: "",
+      category: "",
+      bannerUrl: "",
+      bannerCldPubId: "",
+      isPublished: false,
+    },
+  });
+
+  const handleSubmit = async (data: CreateCourseFormData) => {
+    try {
+      console.log("Creating course:", data);
+
+      // Check if banner is required but not uploaded
+      if (!data.bannerUrl) {
+        toast.error("Error", {
+          description: "Banner image is required. Please upload an image.",
+        });
+        return;
+      }
+
+      // Call the create course action
+      const result = await createCourse({
+        title: data.title,
+        description: data.description,
+        price: data.price,
+        duration: data.duration,
+        level: data.level,
+        category: data.category,
+        bannerUrl: data.bannerUrl,
+        bannerCldPubId: data.bannerCldPubId,
+        isPublished: data.isPublished,
+      });
+
+      if (result.success) {
+        toast.success("Success", {
+          description: "Course created successfully",
+        });
+
+        // Reset form
+        form.reset();
+        setBannerPublicId("");
+
+        router.push(ROUTES.ADMIN_COURSES);
+      } else {
+        toast.error("Error", {
+          description:
+            result.error?.message ||
+            "Failed to create course. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error("Error creating course:", error);
+      toast.error("Error", {
+        description: "Failed to create course. Please try again.",
+      });
+    }
+  };
+
+  return (
+    <Card className="w-full sm:max-w-xl">
+      <CardHeader>
+        <CardTitle>Create Course</CardTitle>
+        <CardDescription>
+          Fill in the details to create a new course
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form
+          id="create-course-form"
+          className="space-y-4"
+          onSubmit={form.handleSubmit(handleSubmit)}
+        >
+          <Controller
+            control={form.control}
+            name="bannerUrl"
+            render={({ field, fieldState }) => (
+              <Field>
+                <FieldLabel>
+                  Banner Image <span className="text-orange-600">*</span>
+                </FieldLabel>
+                <ImageUploadWidget
+                  value={
+                    field.value
+                      ? {
+                          url: field.value,
+                          publicId: bannerPublicId ?? "",
+                        }
+                      : null
+                  }
+                  onChange={(file: UploadWidgetValue | null) => {
+                    if (file) {
+                      field.onChange(file.url);
+                      form.setValue("bannerCldPubId", file.publicId, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                      setBannerPublicId(file.publicId);
+                    } else {
+                      field.onChange("");
+                      form.setValue("bannerCldPubId", "", {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                      setBannerPublicId("");
+                    }
+                  }}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}{" "}
+              </Field>
+            )}
+          />
+          <Controller
+            name="isPublished"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="course-is-published">
+                  Published Status
+                </FieldLabel>
+                <Select
+                  value={field.value ? "true" : "false"}
+                  onValueChange={(value) => field.onChange(value === "true")}
+                >
+                  <SelectTrigger id="course-is-published">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="false">Draft</SelectItem>
+                    <SelectItem value="true">Published</SelectItem>
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            name={"title" as const}
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={`create-course-${field}`}>
+                  Title
+                </FieldLabel>
+                <InputGroup>
+                  <Input
+                    {...field}
+                    id={`create-course-${field}`}
+                    type={"text"}
+                    placeholder={"Course title"}
+                    aria-invalid={fieldState.invalid}
+                  />
+                </InputGroup>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            name="description"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="course-description">
+                  Description
+                </FieldLabel>
+                <InputGroup>
+                  <Textarea
+                    {...field}
+                    id="course-description"
+                    placeholder="Course description"
+                    aria-invalid={fieldState.invalid}
+                  />
+                </InputGroup>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <Controller
+              name="price"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="course-price">Price ($)</FieldLabel>
+                  <InputGroup>
+                    <Input
+                      {...field}
+                      id="course-price"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="0.00"
+                      onChange={(e) =>
+                        field.onChange(parseFloat(e.target.value) || 0)
+                      }
+                      aria-invalid={fieldState.invalid}
+                    />
+                  </InputGroup>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="duration"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="course-duration">
+                    Duration (hours)
+                  </FieldLabel>
+                  <InputGroup>
+                    <Input
+                      {...field}
+                      id="course-duration"
+                      type="number"
+                      placeholder="1"
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value) || 0)
+                      }
+                      aria-invalid={fieldState.invalid}
+                    />
+                  </InputGroup>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Controller
+              name="level"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="course-level">Level</FieldLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="course-level">
+                      <SelectValue placeholder="Select level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner</SelectItem>
+                      <SelectItem value="intermediate">Intermediate</SelectItem>
+                      <SelectItem value="advanced">Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="category"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="course-category">Category</FieldLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="course-category">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="programming">Programming</SelectItem>
+                      <SelectItem value="design">Design</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                      <SelectItem value="marketing">Marketing</SelectItem>
+                      <SelectItem value="data-science">Data Science</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
+        </form>
+      </CardContent>
+      <CardFooter>
+        <div className="w-full space-y-4">
+          <Button
+            type="submit"
+            form="create-course-form"
+            disabled={form.formState.isSubmitting}
+            className="w-full"
+          >
+            {form.formState.isSubmitting ? "Creating..." : "Create"}
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
+  );
+};
+
+export default CreateCourseForm;
