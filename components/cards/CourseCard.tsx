@@ -45,7 +45,7 @@ export default function CourseCard({ course }: { course: Course }) {
       <CardHeader className="flex-1">
         <CardAction className="flex gap-2">
           <span
-            className={`text-sm text-muted-foreground px-2 py-1 rounded-full ${getLevelConfig(level).color}`}
+            className={`text-xs text-muted-foreground px-2 py-1 rounded-full ${getLevelConfig(level).color}`}
           >
             {getLevelConfig(level).name}
           </span>

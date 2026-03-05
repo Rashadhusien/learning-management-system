@@ -9,6 +9,36 @@ export interface SignInWithOAuthParams {
   };
 }
 
+export interface ActionResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
+export interface ErrorResponse {
+  success: false;
+  error: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  role: string;
+  bio?: string | null;
+  phone?: string | null;
+  level: string;
+  totalPoints: number;
+  coverCldPubId?: string | null;
+  imageCldPubId?: string | null;
+  image?: string;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  emailVerified?: Date | null;
+}
+
 export interface AuthCredentails {
   name: string;
   username: string;

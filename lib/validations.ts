@@ -91,3 +91,15 @@ export const CreateCourseSchema = z.object({
   level: z.string().min(1, { message: "Level is required." }),
   categoryId: z.string().min(1, { message: "Category is required." }),
 });
+
+export const CreateProjectSchema = z.object({
+  title: z.string().min(1, { message: "Title is required." }),
+  description: z.string().optional(),
+  imageCldPubId: z.string().min(1, { message: "Banner URL is required." }),
+  points: z.number().min(1, { message: "Points must be a positive number." }),
+  classId: z.string().min(1, { message: "Class is required." }),
+});
+
+export const GetProfileSchema = z.object({
+  userId: z.string().min(1, { message: "User Id is Required" }),
+});

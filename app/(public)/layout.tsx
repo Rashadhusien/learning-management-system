@@ -4,7 +4,7 @@ import React from "react";
 const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="relative">
-      <Navbar />
+      {/* <Navbar /> */}
 
       {children}
       {/* <footer>Footer</footer> */}

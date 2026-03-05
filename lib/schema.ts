@@ -35,7 +35,8 @@ export const users = pgTable(
     email: text("email").unique().notNull(),
     emailVerified: timestamp("email_verified"),
 
-    image: text("image"),
+    coverCldPubId: text("cover_cld_pub_id").default("default-cover"),
+    imageCldPubId: text("image_cld_pub_id").default("default-avatar"),
 
     role: roleEnum("role").default("student").notNull(),
 
@@ -160,17 +161,14 @@ export const enrollments = pgTable(
 
 export const projects = pgTable("projects", {
   id: uuid("id").defaultRandom().primaryKey(),
-
   title: text("title").notNull(),
   description: text("description"),
-
   courseId: uuid("course_id")
     .notNull()
     .references(() => courses.id, { onDelete: "cascade" }),
-
+  imageCldPubId: text("image_cld_pub_id").notNull(),
   points: integer("points").default(50),
   isDeleted: boolean("is_deleted").default(false).notNull(),
-
   ...baseSchema,
 });
 
