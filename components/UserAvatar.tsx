@@ -1,13 +1,14 @@
-import Image from "next/image";
+"use client";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { ROUTES } from "@/constants/routes";
+import { CldImage } from "next-cloudinary";
 
 interface Props {
-  id: string;
+  id?: string;
   name: string;
   imageUrl?: string | null;
   className?: string;
@@ -29,15 +30,15 @@ const UserAvatar = ({
     .slice(0, 2);
 
   return (
-    <Link href={ROUTES.PROFILE}>
+    <Link href={ROUTES.PROFILE} className="w-fit overflow-hidden rounded-full">
       <Avatar className={cn("relative", className)}>
         {imageUrl ? (
-          <Image
+          <CldImage
             src={imageUrl}
             alt={name}
             className="object-cover"
             fill
-            quality={100}
+            quality={70}
           />
         ) : (
           <AvatarFallback

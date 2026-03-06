@@ -39,6 +39,7 @@ export const users = pgTable(
     imageCldPubId: text("image_cld_pub_id").default("default-avatar"),
 
     role: roleEnum("role").default("student").notNull(),
+    active: boolean("active").default(false).notNull(),
 
     // Academy fields
     bio: text("bio"),

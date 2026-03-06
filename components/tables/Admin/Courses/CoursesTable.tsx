@@ -13,12 +13,12 @@ import {
 } from "@/components/ui/table-columns";
 import { Course } from "@/types/action.d";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
 import {
   getLevelConfig,
   getCategoryConfig,
   getStatusConfig,
 } from "@/constants/colors";
+import { CldImage } from "next-cloudinary";
 
 export function CoursesTable({
   data,
@@ -38,7 +38,7 @@ export function CoursesTable({
       cell: ({ row }) => {
         return (
           <div className="max-w-xs">
-            <Image
+            <CldImage
               src={row.getValue("bannerUrl")}
               alt="Course Banner"
               className="w-10 h-10 rounded-sm scale-105 object-cover"

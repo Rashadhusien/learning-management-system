@@ -41,3 +41,8 @@ export const EMPTY_PROJECT = {
   title: "No projects found",
   message: "try searching for something else",
 };
+
+export const EMPTY_STUDENT = {
+  title: "No students found",
+  message: "try searching for something else",
+};

@@ -8,6 +8,7 @@ export const ROUTES = {
   PROJECTS: "/projects",
   PROJECT_DETAILS: (id: string) => `/projects/${id}`,
   STUDENTS: "/students",
+  STUDENT_DETAILS: (id: string) => `/students/${id}`,
   LEADERBOARD: "/leaderboard",
   ACHIEVEMENTS: "/achievements",
   ADMIN: "/admin",

@@ -70,13 +70,13 @@ export const adminLinks = [
     label: "Students",
   },
   {
-    imgUrl: "/icons/leaderboard.svg",
-    route: ROUTES.ADMIN_LEADERBOARD,
-    label: "Leaderboard",
-  },
-  {
     imgUrl: "/icons/achievements.svg",
     route: ROUTES.ADMIN_ACHIEVEMENTS,
     label: "Achievements",
+  },
+  {
+    imgUrl: "/icons/leaderboard.svg",
+    route: ROUTES.ADMIN_LEADERBOARD,
+    label: "Leaderboard",
   },
 ];

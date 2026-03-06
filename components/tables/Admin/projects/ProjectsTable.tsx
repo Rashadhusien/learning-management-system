@@ -4,14 +4,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/ui/data-table";
 import {
   createActionsColumn,
-  createDateColumn,
   createEditAction,
   createDeleteAction,
   createViewAction,
 } from "@/components/ui/table-columns";
 import { Project } from "@/types/action.d";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
+import { CldImage } from "next-cloudinary";
 
 export function ProjectsTable({
   data,
@@ -31,7 +30,7 @@ export function ProjectsTable({
       cell: ({ row }) => {
         return (
           <div className="max-w-xs">
-            <Image
+            <CldImage
               src={row.getValue("imageCldPubId")}
               alt="Project Banner"
               className="w-10 h-10 rounded-sm scale-105 object-cover"

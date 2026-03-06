@@ -7,7 +7,7 @@ import { getAllStudents } from "@/lib/actions/students.action";
 import { StudentTableWrapper } from "@/components/tables/Admin/students/StudentTableWrapper";
 
 const AdminStudents = async () => {
-  const projects = await getAllStudents({
+  const students = await getAllStudents({
     page: 1,
     pageSize: 10,
   });
@@ -30,9 +30,9 @@ const AdminStudents = async () => {
       </div>
 
       <DataRenderer
-        success={projects.success}
-        error={projects.error ? { message: projects.error } : undefined}
-        data={projects.data}
+        success={students.success}
+        error={students.error ? { message: students.error } : undefined}
+        data={students.data}
         empty={EMYPTY_COURSE}
         render={(data) => <StudentTableWrapper data={data} />}
       />
