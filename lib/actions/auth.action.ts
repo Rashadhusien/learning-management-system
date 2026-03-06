@@ -11,6 +11,7 @@ import { signIn } from "@/auth";
 import { signOut } from "@/auth";
 import { ROUTES } from "@/constants/routes";
 import { AuthCredentails } from "@/types/action";
+import { checkAndAwardAchievements } from "./achievements.action";
 
 export const logInWithCredentails = async (
   params: Pick<AuthCredentails, "email" | "password">,
@@ -139,7 +140,10 @@ export const registerWithCredentails = async (params: AuthCredentails) => {
 
     console.log("New account created:", newAccount);
 
+    // Check and award achievements
+
     await signIn("credentials", { email, password, redirect: false });
+    await checkAndAwardAchievements(newUser[0]!.id, "register");
     return { success: true };
   } catch (error) {
     return handleError(error) as ErrorResponse;

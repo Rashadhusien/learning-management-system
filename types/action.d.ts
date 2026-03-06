@@ -113,6 +113,17 @@ export type Achievement = {
   description?: string | null;
   imageCldPubId: string;
   requiredPoints: number | null;
+  progressPercent?: number | null;
+  totalStudents?: number | null;
+  earnedCount?: number | null;
+};
+
+export type StudentAchievement = {
+  id: string;
+  studentId: string;
+  achievementId: string;
+  earnedAt: Date;
+  achievement?: Achievement; // Populated when joining with achievements
 };
 
 export type Project = {
