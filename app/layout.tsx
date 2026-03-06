@@ -5,7 +5,6 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import Script from "next/script";
-import Navbar from "@/components/navigation/navbar";
 
 // const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -49,7 +48,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
           {children}
         </ThemeProvider>
         <Toaster richColors />

@@ -7,49 +7,42 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getLevelConfig } from "@/constants/colors";
 import { ROUTES } from "@/constants/routes";
-import { Course } from "@/types/action";
+import { Project } from "@/types/action";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
 
-export default function CourseCard({ course }: { course: Course }) {
+export default function ProjectCard({ project }: { project: Project }) {
   const {
     id,
     title,
     description,
 
-    bannerUrl,
-    level,
-  } = course;
+    imageCldPubId,
+    points,
+  } = project;
   return (
     <Card className="group relative mx-auto w-full max-w-sm pt-0  transition-transform duration-300 hover:shadow-lg">
-      <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
       <div className="relative overflow-hidden">
         <Image
-          src={bannerUrl}
+          src={imageCldPubId}
           alt={title}
-          className="relative z-20 aspect-video w-full object-cover group-hover:scale-110 transition-transform duration-300"
-          width={500}
-          height={500}
+          className="relative z-20  aspect-video w-full h-36 object-contain "
+          width={300}
+          height={300}
         />
       </div>
       <CardHeader className="flex-1">
         <CardAction className="flex gap-2">
-          {/* <span
-            className={`text-xs text-muted-foreground px-2 py-1 rounded-full ${getLevelConfig(level).color}`}
-          >
-            {getLevelConfig(level).name}
-          </span> */}
-          <Badge variant="secondary">{level}</Badge>
+          <Badge variant="secondary">{points} Points</Badge>
         </CardAction>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardFooter>
         <Button className="w-full" asChild size={"lg"}>
-          <Link href={ROUTES.COURSE_DETAIL(id)}>View Course</Link>
+          <Link href={ROUTES.PROJECT_DETAILS(id)}>View Project</Link>
         </Button>
       </CardFooter>
     </Card>

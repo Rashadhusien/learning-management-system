@@ -14,7 +14,7 @@ const StudentLayout = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div>
-      {/* <Navbar /> */}
+      <Navbar />
       <main className="container mx-auto px-4 py-8">
         <ProfileHeader userProfile={userProfile!} />
         {children}

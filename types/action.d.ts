@@ -15,9 +15,22 @@ export interface ActionResponse<T = unknown> {
   error?: string;
 }
 
+export interface PaginatedResponse<T = unknown> extends ActionResponse<T[]> {
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+    isNext: boolean;
+  };
+}
+
 export interface ErrorResponse {
   success: false;
-  error: string;
+  error: {
+    message: string;
+    details?: Record<string, string[]>;
+  };
 }
 
 export interface User {
@@ -79,6 +92,24 @@ export interface UpdateCategoryParams {
   description?: string;
   icon?: string;
 }
+
+export interface CreateProjectParams {
+  title: string;
+  description?: string;
+  imageCldPubId: string;
+  points: number;
+  classId: string;
+}
+
+export type Project = {
+  id: string;
+  title: string;
+  description?: string | null;
+  courseId: string;
+  imageCldPubId: string;
+  points: number | null;
+  courseTitle?: string | null;
+};
 
 export interface Course {
   id: string;

@@ -103,3 +103,11 @@ export const CreateProjectSchema = z.object({
 export const GetProfileSchema = z.object({
   userId: z.string().min(1, { message: "User Id is Required" }),
 });
+
+export const PaginatedSearchParamsSchema = z.object({
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().positive().default(10),
+  query: z.string().optional(),
+  filter: z.string().optional(),
+  sort: z.string().optional(),
+});

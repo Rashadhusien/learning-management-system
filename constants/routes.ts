@@ -6,6 +6,7 @@ export const ROUTES = {
   COURSES: "/courses",
   COURSE_DETAIL: (id: string) => `/courses/${id}`,
   PROJECTS: "/projects",
+  PROJECT_DETAILS: (id: string) => `/projects/${id}`,
   STUDENTS: "/students",
   LEADERBOARD: "/leaderboard",
   ACHIEVEMENTS: "/achievements",

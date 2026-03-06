@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 const Navbar = async () => {
   const session = await auth();
   return (
-    <nav className="p-4 bg-background/30 ">
-      <div className="container mx-auto flex items-center justify-between md::justify-around">
+    <nav className="p-4 bg-background/20 backdrop-blur-md border-b border-border/40 sticky top-0 z-50">
+      <div className="container mx-auto flex items-center justify-between md:justify-around">
         <h1 className="text-3xl font-bold font-space-grotesk  text-primary">
           <Link href={ROUTES.HOME}>Cody</Link>
         </h1>

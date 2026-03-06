@@ -1,13 +1,20 @@
 "use server";
 
 import action from "../handlers/action";
-import { CreateCourseSchema } from "../validations";
+import {
+  CreateCourseSchema,
+  PaginatedSearchParamsSchema,
+} from "../validations";
 import { db } from "../db";
 import { courses, categories } from "../schema";
 import { revalidatePath } from "next/cache";
 import handleError from "../handlers/error";
-import { CreateCourseParams, Course } from "@/types/action.d";
-import { eq } from "drizzle-orm";
+import {
+  CreateCourseParams,
+  Course,
+  PaginatedResponse,
+} from "@/types/action.d";
+import { eq, ilike, desc, asc, and, or, getTableColumns } from "drizzle-orm";
 
 // Create Course
 export async function createCourse(
@@ -60,35 +67,108 @@ export async function createCourse(
 }
 
 // get all Courses with category information
-export async function getAllCourses(): Promise<ActionResponse<Course[]>> {
+export async function getAllCourses(
+  params: PaginatedSearchParams,
+): Promise<PaginatedResponse<Course>> {
+  const validationResult = await action({
+    params,
+    schema: PaginatedSearchParamsSchema,
+  });
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
+
+  const {
+    page = 1,
+    pageSize = 10,
+    query,
+    filter,
+    sort = "created-desc",
+  } = params;
+  const offset = (page - 1) * pageSize;
+
   try {
+    // Build where conditions
+    const whereConditions = [eq(courses.isDeleted, false)];
+
+    // Add search query filter
+    if (query) {
+      const searchCondition = or(
+        ilike(courses.title, `%${query}%`),
+        ilike(courses.description, `%${query}%`),
+      );
+      if (searchCondition) {
+        whereConditions.push(searchCondition);
+      }
+    }
+
+    // Add category filter
+    if (filter) {
+      whereConditions.push(eq(courses.categoryId, filter));
+    }
+
+    // Build order by clause
+    let orderByClause;
+    switch (sort) {
+      case "title-asc":
+        orderByClause = asc(courses.title);
+        break;
+      case "title-desc":
+        orderByClause = desc(courses.title);
+        break;
+      case "price-asc":
+        orderByClause = asc(courses.price);
+        break;
+      case "price-desc":
+        orderByClause = desc(courses.price);
+        break;
+      case "created-desc":
+        orderByClause = desc(courses.createdAt);
+        break;
+      case "created-asc":
+        orderByClause = asc(courses.createdAt);
+        break;
+      default:
+        orderByClause = desc(courses.createdAt);
+    }
+
+    // Get total count for pagination
+    const totalCountResult = await db
+      .select({ count: courses.id })
+      .from(courses)
+      .where(and(...whereConditions));
+
+    const total = totalCountResult.length;
+
+    // Get paginated courses
     const allCourses = await db
       .select({
-        id: courses.id,
-        title: courses.title,
-        description: courses.description,
-        price: courses.price,
-        isPublished: courses.isPublished,
-        bannerUrl: courses.bannerUrl,
-        duration: courses.duration,
-        level: courses.level,
-        categoryId: courses.categoryId,
-        instructorId: courses.instructorId,
-        isDeleted: courses.isDeleted,
-        createdAt: courses.createdAt,
-        updatedAt: courses.updatedAt,
+        ...getTableColumns(courses),
         category: {
-          id: categories.id,
-          name: categories.name,
+          ...getTableColumns(categories),
         },
       })
       .from(courses)
       .leftJoin(categories, eq(courses.categoryId, categories.id))
-      .where(eq(courses.isDeleted, false));
+      .where(and(...whereConditions))
+      .orderBy(orderByClause)
+      .limit(pageSize)
+      .offset(offset);
+
+    const totalPages = Math.ceil(total / pageSize);
+
+    const isNext = total > page * pageSize;
 
     return {
       success: true,
       data: allCourses as Course[],
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages,
+        isNext,
+      },
     };
   } catch (error) {
     console.error("Error getting courses:", error);

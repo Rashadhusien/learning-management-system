@@ -65,7 +65,11 @@ export function CoursesTable({
       header: "Description",
       cell: ({ row }) => {
         const description = row.getValue("description") as string;
-        return <div className="max-w-xs truncate">{description}</div>;
+        return (
+          <div className="max-w-xs truncate">
+            {description || "No description"}
+          </div>
+        );
       },
     },
     {

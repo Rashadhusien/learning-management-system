@@ -9,8 +9,6 @@ import { CategoriesTableWrapper } from "@/components/tables/Admin/Categories/Cat
 const AdminCategories = async () => {
   const categories = await getAllCategories();
 
-  console.log(categories);
-
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">

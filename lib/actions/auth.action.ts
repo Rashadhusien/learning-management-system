@@ -7,10 +7,10 @@ import { users, accounts } from "../schema";
 import { LoginSchema, RegisterSchema } from "../validations";
 import bcrypt from "bcryptjs";
 import { signIn } from "@/auth";
-import { NotFoundError } from "../http-errors";
 
 import { signOut } from "@/auth";
 import { ROUTES } from "@/constants/routes";
+import { AuthCredentails } from "@/types/action";
 
 export const logInWithCredentails = async (
   params: Pick<AuthCredentails, "email" | "password">,
@@ -29,7 +29,12 @@ export const logInWithCredentails = async (
     .where(eq(users.email, email));
 
   if (!existingUser) {
-    throw new NotFoundError("User not found");
+    return {
+      success: false,
+      error: {
+        message: "User not found",
+      },
+    };
   }
 
   const [existingAccount] = await db
@@ -38,7 +43,12 @@ export const logInWithCredentails = async (
     .where(eq(accounts.providerAccountId, email));
 
   if (!existingAccount) {
-    throw new NotFoundError("User account not found");
+    return {
+      success: false,
+      error: {
+        message: "User account not found",
+      },
+    };
   }
 
   const passwordMatch = await bcrypt.compare(
@@ -47,7 +57,12 @@ export const logInWithCredentails = async (
   );
 
   if (!passwordMatch) {
-    throw new Error("Password does not match!");
+    return {
+      success: false,
+      error: {
+        message: "Invalid Credentials",
+      },
+    };
   }
 
   await signIn("credentials", { email, password, redirect: false });
@@ -71,7 +86,12 @@ export const registerWithCredentails = async (params: AuthCredentails) => {
       .where(eq(users.email, email));
 
     if (existingUser) {
-      throw new Error("User already exists");
+      return {
+        success: false,
+        error: {
+          message: "User already exists",
+        },
+      };
     }
 
     // Check if username already exists
@@ -81,7 +101,12 @@ export const registerWithCredentails = async (params: AuthCredentails) => {
       .where(eq(users.username, username));
 
     if (existingUsername) {
-      throw new Error("Username already exists");
+      return {
+        success: false,
+        error: {
+          message: "Username already exists",
+        },
+      };
     }
 
     // Hash the password

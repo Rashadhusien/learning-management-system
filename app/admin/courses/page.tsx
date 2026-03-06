@@ -7,7 +7,10 @@ import { EMYPTY_COURSE } from "@/constants/states";
 import { CoursesTableWrapper } from "@/components/tables/Admin/Courses/CoursesTableWrapper";
 
 const AdminCourses = async () => {
-  const courses = await getAllCourses();
+  const courses = await getAllCourses({
+    page: 1,
+    pageSize: 10,
+  });
 
   console.log(courses);
 

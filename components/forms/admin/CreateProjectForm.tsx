@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import type { Resolver } from "react-hook-form";
+import { createProject } from "@/lib/actions/projects.action";
 import { getAllCourses } from "@/lib/actions/courses.action";
 import { Course } from "@/types/action.d";
 
@@ -84,7 +85,7 @@ const CreateProjectForm = () => {
 
   const handleSubmit = async (data: CreateProjectFormData) => {
     try {
-      console.log("Creating course:", data);
+      console.log("Creating project:", data);
 
       // Check if banner is required but not uploaded
       if (!data.imageCldPubId) {
@@ -94,11 +95,39 @@ const CreateProjectForm = () => {
         return;
       }
 
-      // Call the create course action
-    } catch (error) {
-      console.error("Error creating course:", error);
+      // Call the create project action
+      const result = await createProject({
+        title: data.title,
+        description: data.description,
+        imageCldPubId: data.imageCldPubId,
+        points: data.points,
+        classId: data.classId,
+      });
+
+      if (result.success) {
+        toast.success("Success", {
+          description: "Project created successfully!",
+        });
+        router.push("/admin/projects");
+      } else {
+        const errorMessage =
+          typeof result.error === "string"
+            ? result.error
+            : result.error?.message ||
+              "Failed to create project. Please try again.";
+
+        toast.error("Error", {
+          description: errorMessage,
+        });
+      }
+    } catch (error: unknown) {
+      console.error("Error creating project:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to create project. Please try again.";
       toast.error("Error", {
-        description: "Failed to create course. Please try again.",
+        description: errorMessage,
       });
     }
   };

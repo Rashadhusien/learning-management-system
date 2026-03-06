@@ -25,17 +25,7 @@ const AuthLayout = ({ children }: { children: ReactNode }) => {
             className="object-contain"
           /> 
         </div> */}
-        <Image
-          src={"/images/auth-background.png"}
-          alt="Auth Background"
-          fill
-          objectFit="cover"
-          objectPosition="center"
-          quality={75}
-          className="object-cover  absolute top-0 left-0 -z-20"
-        />
-        {/* dark layer */}
-        <div className="absolute top-0 left-0 -z-10 h-full w-full bg-black opacity-70"></div>
+
         {children}
         {/* <div className="border mt-4 border-white dark:border-dark-400 relative">
           <span className="absolute top-1/2 left-1/2 transform -translate-1/2 p-2 background-light800_dark200 rounded-full">

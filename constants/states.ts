@@ -30,9 +30,14 @@ export const EMYPTY_CATEGORY = {
 
 export const EMYPTY_COURSE = {
   title: "No courses found",
-  message: "Add your first course to get started",
+  message: "try searching for something else",
   button: {
     text: "Add Course",
     href: ROUTES.ADMIN_CREATE_COURSE,
   },
+};
+
+export const EMPTY_PROJECT = {
+  title: "No projects found",
+  message: "try searching for something else",
 };
