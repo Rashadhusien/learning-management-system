@@ -111,3 +111,12 @@ export const PaginatedSearchParamsSchema = z.object({
   filter: z.string().optional(),
   sort: z.string().optional(),
 });
+
+export const CreateAchievementSchema = z.object({
+  title: z.string().min(1, { message: "Title is required." }),
+  description: z.string().optional(),
+  imageCldPubId: z.string().min(1, { message: "Image URL is required." }),
+  requiredPoints: z
+    .number()
+    .min(1, { message: "Points must be a positive number." }),
+});

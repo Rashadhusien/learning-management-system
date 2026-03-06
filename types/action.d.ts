@@ -100,6 +100,20 @@ export interface CreateProjectParams {
   points: number;
   classId: string;
 }
+export interface CreateAchievementParams {
+  title: string;
+  description?: string;
+  imageCldPubId: string;
+  requiredPoints: number;
+}
+
+export type Achievement = {
+  id: string;
+  title: string;
+  description?: string | null;
+  imageCldPubId: string;
+  requiredPoints: number | null;
+};
 
 export type Project = {
   id: string;

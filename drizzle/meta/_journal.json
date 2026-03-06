@@ -50,6 +50,13 @@
       "when": 1772808047883,
       "tag": "0006_real_microchip",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1772818012543,
+      "tag": "0007_tiresome_secret_warriors",
+      "breakpoints": true
     }
   ]
 }

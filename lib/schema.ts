@@ -205,6 +205,7 @@ export const projectSubmissions = pgTable(
 export const achievements = pgTable("achievements", {
   id: uuid("id").defaultRandom().primaryKey(),
 
+  imageCldPubId: text("image_cld_pub_id").notNull(),
   title: text("title").notNull(),
   description: text("description"),
 

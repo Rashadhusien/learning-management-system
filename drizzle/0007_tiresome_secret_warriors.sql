@@ -1,0 +1,1 @@
+ALTER TABLE "achievements" ADD COLUMN "image_cld_pub_id" text NOT NULL;

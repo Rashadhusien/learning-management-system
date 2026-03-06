@@ -11,6 +11,7 @@ export const ROUTES = {
   STUDENT_DETAILS: (id: string) => `/students/${id}`,
   LEADERBOARD: "/leaderboard",
   ACHIEVEMENTS: "/achievements",
+  ACHIEVEMENT_DETAILS: (id: string) => `/achievements/${id}`,
   ADMIN: "/admin",
   ADMIN_COURSES: "/admin/courses",
   ADMIN_CREATE_COURSE: "/admin/courses/create",

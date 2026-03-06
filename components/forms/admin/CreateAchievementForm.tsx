@@ -3,13 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import type { Resolver } from "react-hook-form";
-import { createProject } from "@/lib/actions/projects.action";
-import { getAllCourses } from "@/lib/actions/courses.action";
-import { Course } from "@/types/action.d";
 
 interface UploadWidgetValue {
   url: string;
@@ -38,54 +35,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { CreateProjectSchema } from "@/lib/validations";
+import { CreateAchievementSchema } from "@/lib/validations";
 import { Textarea } from "@/components/ui/textarea";
 import ImageUploadWidget from "@/components/upload-widget";
 import { ROUTES } from "@/constants/routes";
+import { createAchievement } from "@/lib/actions/achievements.action";
 
-type CreateAchievementFormData = z.infer<typeof CreateProjectSchema> & {
+type CreateAchievementFormData = z.infer<typeof CreateAchievementSchema> & {
   bannerCldPubId?: string;
 };
 
 const CreateAchievementForm = () => {
   const router = useRouter();
   const [bannerPublicId, setBannerPublicId] = useState<string>("");
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loadingCourses, setLoadingCourses] = useState(true);
 
   const form = useForm<CreateAchievementFormData>({
     resolver: zodResolver(
-      CreateProjectSchema,
+      CreateAchievementSchema,
     ) as Resolver<CreateAchievementFormData>,
     defaultValues: {
       title: "",
       description: "",
       imageCldPubId: "",
-      points: 50,
-      classId: "",
+      requiredPoints: 0,
     },
   });
 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const result = await getAllCourses();
-        if (result.success && result.data) {
-          setCourses(result.data);
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      } finally {
-        setLoadingCourses(false);
-      }
-    };
-
-    fetchCourses();
-  }, []);
-
   const handleSubmit = async (data: CreateAchievementFormData) => {
     try {
-      console.log("Creating project:", data);
+      console.log("Creating achievement:", data);
 
       // Check if banner is required but not uploaded
       if (!data.imageCldPubId) {
@@ -95,37 +73,35 @@ const CreateAchievementForm = () => {
         return;
       }
 
-      // Call the create project action
-      const result = await createProject({
+      const result = await createAchievement({
         title: data.title,
         description: data.description,
         imageCldPubId: data.imageCldPubId,
-        points: data.points,
-        classId: data.classId,
+        requiredPoints: data.requiredPoints,
       });
 
       if (result.success) {
         toast.success("Success", {
-          description: "Project created successfully!",
+          description: "Achievement created successfully!",
         });
-        router.push("/admin/projects");
+        router.push(ROUTES.ADMIN_ACHIEVEMENTS);
       } else {
         const errorMessage =
           typeof result.error === "string"
             ? result.error
             : result.error?.message ||
-              "Failed to create project. Please try again.";
+              "Failed to create Achievement. Please try again.";
 
         toast.error("Error", {
           description: errorMessage,
         });
       }
     } catch (error: unknown) {
-      console.error("Error creating project:", error);
+      console.error("Error creating achievement:", error);
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Failed to create project. Please try again.";
+          : "Failed to create achievement. Please try again.";
       toast.error("Error", {
         description: errorMessage,
       });
@@ -135,14 +111,14 @@ const CreateAchievementForm = () => {
   return (
     <Card className="w-full sm:max-w-xl">
       <CardHeader>
-        <CardTitle>Create Course</CardTitle>
+        <CardTitle>Create Achievement</CardTitle>
         <CardDescription>
-          Fill in the details to create a new course
+          Fill in the details to create a new achievement
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form
-          id="create-course-form"
+          id="create-achievement-form"
           className="space-y-4"
           onSubmit={form.handleSubmit(handleSubmit)}
         >
@@ -193,15 +169,15 @@ const CreateAchievementForm = () => {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={`create-course-${field}`}>
+                <FieldLabel htmlFor={`create-achievement-${field}`}>
                   Title
                 </FieldLabel>
                 <InputGroup>
                   <Input
                     {...field}
-                    id={`create-course-${field}`}
+                    id={`create-achievement-${field}`}
                     type={"text"}
-                    placeholder={"Course title"}
+                    placeholder={"achievement title"}
                     aria-invalid={fieldState.invalid}
                   />
                 </InputGroup>
@@ -216,14 +192,14 @@ const CreateAchievementForm = () => {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="course-description">
+                <FieldLabel htmlFor="achievement-description">
                   Description
                 </FieldLabel>
                 <InputGroup>
                   <Textarea
                     {...field}
-                    id="course-description"
-                    placeholder="Course description"
+                    id="achievement-description"
+                    placeholder="achievement description"
                     aria-invalid={fieldState.invalid}
                   />
                 </InputGroup>
@@ -233,72 +209,38 @@ const CreateAchievementForm = () => {
               </Field>
             )}
           />
-          <div className="grid grid-cols-2 gap-4">
-            <Controller
-              name="points"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="course-points">Points</FieldLabel>
-                  <InputGroup>
-                    <Input
-                      {...field}
-                      id="course-points"
-                      type="number"
-                      min="0"
-                      placeholder="0"
-                      onChange={(e) =>
-                        field.onChange(parseInt(e.target.value) || 0)
-                      }
-                      aria-invalid={fieldState.invalid}
-                    />
-                  </InputGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="classId"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="course-category">Category</FieldLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={loadingCourses}
-                  >
-                    <SelectTrigger id="course-category">
-                      <SelectValue
-                        placeholder={
-                          loadingCourses ? "Loading..." : "Select category"
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {courses.map((course) => (
-                        <SelectItem key={course.id} value={course.id}>
-                          {course.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </div>
+          <Controller
+            name="requiredPoints"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="achievement-points">Points</FieldLabel>
+                <InputGroup>
+                  <Input
+                    {...field}
+                    id="achievement-points"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    onChange={(e) =>
+                      field.onChange(parseInt(e.target.value) || 0)
+                    }
+                    aria-invalid={fieldState.invalid}
+                  />
+                </InputGroup>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
         </form>
       </CardContent>
       <CardFooter>
         <div className="w-full space-y-4">
           <Button
             type="submit"
-            form="create-course-form"
+            form="create-achievement-form"
             disabled={form.formState.isSubmitting}
             className="w-full"
           >

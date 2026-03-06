@@ -2,11 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import DataRenderer from "@/components/DataRenderer";
-import { EMYPTY_CATEGORY } from "@/constants/states";
-import { CategoriesTableWrapper } from "@/components/tables/Admin/Categories/CategoriesTableWrapper";
+import { EMPTY_ACHIEVEMENT } from "@/constants/states";
+import { getAllAchievements } from "@/lib/actions/achievements.action";
+import { AchievementsTableWrapper } from "@/components/tables/Admin/achievements/AchievementsTableWrapper";
 
 const AdminAchievements = async () => {
-  // const categories = await getAllAchivements();
+  const achievements = await getAllAchievements({
+    page: 1,
+    pageSize: 10,
+  });
 
   return (
     <div className="p-6 space-y-6">
@@ -25,14 +29,13 @@ const AdminAchievements = async () => {
         </Link>
       </div>
 
-      {/* Categories Table */}
-      {/* <DataRenderer
-        success={categories.success}
-        error={categories.error}
-        data={categories.data}
-        empty={EMYPTY_CATEGORY}
-        render={(data) => <CategoriesTableWrapper data={data} />}
-      /> */}
+      <DataRenderer
+        success={achievements.success}
+        error={achievements.error}
+        data={achievements.data}
+        empty={EMPTY_ACHIEVEMENT}
+        render={(data) => <AchievementsTableWrapper data={data} />}
+      />
     </div>
   );
 };

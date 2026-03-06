@@ -46,3 +46,8 @@ export const EMPTY_STUDENT = {
   title: "No students found",
   message: "try searching for something else",
 };
+
+export const EMPTY_ACHIEVEMENT = {
+  title: "No achievements found",
+  message: "Create your first achievement to get started",
+};

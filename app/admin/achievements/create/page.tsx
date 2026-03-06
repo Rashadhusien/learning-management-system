@@ -1,4 +1,5 @@
 "use client";
+import CreateAchievementForm from "@/components/forms/admin/CreateAchievementForm";
 import CreateCourseForm from "@/components/forms/admin/CreateCourseForm";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -20,7 +21,9 @@ const CreateCourse = () => {
         </Button>
         <h2 className="text-2xl font-bold">Create Achievement</h2>
       </div>
-      <CreateAchievementForm />
+      <div className="mt-4 flex justify-center items-center">
+        <CreateAchievementForm />
+      </div>
     </section>
   );
 };
