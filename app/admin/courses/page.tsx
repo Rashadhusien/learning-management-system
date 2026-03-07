@@ -108,7 +108,11 @@ const AdminCourses = async () => {
       </div> */}
       <DataRenderer
         success={courses.success}
-        error={courses.error}
+        error={
+          typeof courses.error === "string"
+            ? { message: courses.error }
+            : courses.error
+        }
         data={courses.data}
         empty={EMYPTY_COURSE}
         render={(data) => <CoursesTableWrapper data={data} />}

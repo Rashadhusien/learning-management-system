@@ -6,7 +6,7 @@ import {
   PaginatedSearchParamsSchema,
 } from "../validations";
 import { db } from "../db";
-import { courses, categories } from "../schema";
+import { courses, categories, enrollments } from "../schema";
 import { revalidatePath } from "next/cache";
 import handleError from "../handlers/error";
 import {
@@ -14,9 +14,39 @@ import {
   Course,
   PaginatedResponse,
 } from "@/types/action.d";
-import { eq, ilike, desc, asc, and, or, getTableColumns } from "drizzle-orm";
+import {
+  eq,
+  ilike,
+  desc,
+  asc,
+  and,
+  or,
+  count,
+  getTableColumns,
+  sql,
+} from "drizzle-orm";
+import { auth } from "@/auth";
 
-// Create Course
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export type CourseWithCategory = Course & {
+  category: {
+    id: string;
+    name: string;
+    description: string | null;
+    icon: string | null;
+    isDeleted: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  } | null;
+};
+
+export type StudentCourse = CourseWithCategory & {
+  enrolledAt: Date;
+};
+
+// ─── Create ───────────────────────────────────────────────────────────────────
+
 export async function createCourse(
   params: CreateCourseParams,
 ): Promise<ActionResponse<Course>> {
@@ -39,7 +69,7 @@ export async function createCourse(
   }
 
   try {
-    const newCourse = await db
+    const [newCourse] = await db
       .insert(courses)
       .values({
         title: validatedData.title,
@@ -50,30 +80,29 @@ export async function createCourse(
         categoryId: validatedData.categoryId,
         bannerUrl: validatedData.bannerUrl,
         isPublished: validatedData.isPublished,
-        instructorId: session.user.id, // Get instructorId from session
+        instructorId: session.user.id,
       })
       .returning();
 
     revalidatePath("/admin/courses");
 
-    return {
-      success: true,
-      data: newCourse[0] as Course,
-    };
+    return { success: true, data: newCourse as Course };
   } catch (error) {
     console.error("Error creating course:", error);
     return handleError(error) as ErrorResponse;
   }
 }
 
-// get all Courses with category information
+// ─── Get All (admin / public browse) ─────────────────────────────────────────
+
 export async function getAllCourses(
   params: PaginatedSearchParams,
-): Promise<PaginatedResponse<Course>> {
+): Promise<PaginatedResponse<CourseWithCategory>> {
   const validationResult = await action({
     params,
     schema: PaginatedSearchParamsSchema,
   });
+
   if (validationResult instanceof Error) {
     return handleError(validationResult) as ErrorResponse;
   }
@@ -88,65 +117,30 @@ export async function getAllCourses(
   const offset = (page - 1) * pageSize;
 
   try {
-    // Build where conditions
     const whereConditions = [eq(courses.isDeleted, false)];
 
-    // Add search query filter
     if (query) {
       const searchCondition = or(
         ilike(courses.title, `%${query}%`),
         ilike(courses.description, `%${query}%`),
       );
-      if (searchCondition) {
-        whereConditions.push(searchCondition);
-      }
+      if (searchCondition) whereConditions.push(searchCondition);
     }
 
-    // Add category filter
-    if (filter) {
-      whereConditions.push(eq(courses.categoryId, filter));
-    }
+    if (filter) whereConditions.push(eq(courses.categoryId, filter));
 
-    // Build order by clause
-    let orderByClause;
-    switch (sort) {
-      case "title-asc":
-        orderByClause = asc(courses.title);
-        break;
-      case "title-desc":
-        orderByClause = desc(courses.title);
-        break;
-      case "price-asc":
-        orderByClause = asc(courses.price);
-        break;
-      case "price-desc":
-        orderByClause = desc(courses.price);
-        break;
-      case "created-desc":
-        orderByClause = desc(courses.createdAt);
-        break;
-      case "created-asc":
-        orderByClause = asc(courses.createdAt);
-        break;
-      default:
-        orderByClause = desc(courses.createdAt);
-    }
+    const orderByClause = buildCourseOrderBy(sort);
 
-    // Get total count for pagination
-    const totalCountResult = await db
-      .select({ count: courses.id })
+    // Correct total count using count()
+    const [{ total }] = await db
+      .select({ total: count() })
       .from(courses)
       .where(and(...whereConditions));
 
-    const total = totalCountResult.length;
-
-    // Get paginated courses
     const allCourses = await db
       .select({
         ...getTableColumns(courses),
-        category: {
-          ...getTableColumns(categories),
-        },
+        category: { ...getTableColumns(categories) },
       })
       .from(courses)
       .leftJoin(categories, eq(courses.categoryId, categories.id))
@@ -155,19 +149,15 @@ export async function getAllCourses(
       .limit(pageSize)
       .offset(offset);
 
-    const totalPages = Math.ceil(total / pageSize);
-
-    const isNext = total > page * pageSize;
-
     return {
       success: true,
-      data: allCourses as Course[],
+      data: allCourses as CourseWithCategory[],
       pagination: {
         page,
         pageSize,
         total,
-        totalPages,
-        isNext,
+        totalPages: Math.ceil(total / pageSize),
+        isNext: total > page * pageSize,
       },
     };
   } catch (error) {
@@ -176,116 +166,140 @@ export async function getAllCourses(
   }
 }
 
-// // get Courses by category
-// export async function getCoursesByCategory(
-//   categoryId: string,
-// ): Promise<ActionResponse<Course[]>> {
-//   try {
-//     const categoryCourses = await db
-//       .select({
-//         id: courses.id,
-//         title: courses.title,
-//         description: courses.description,
-//         price: courses.price,
-//         isPublished: courses.isPublished,
-//         bannerUrl: courses.bannerUrl,
-//         duration: courses.duration,
-//         level: courses.level,
-//         categoryId: courses.categoryId,
-//         instructorId: courses.instructorId,
-//         isDeleted: courses.isDeleted,
-//         createdAt: courses.createdAt,
-//         updatedAt: courses.updatedAt,
-//         category: {
-//           id: categories.id,
-//           name: categories.name,
-//           description: categories.description,
-//           icon: categories.icon,
-//         },
-//       })
-//       .from(courses)
-//       .leftJoin(categories, eq(courses.categoryId, categories.id))
-//       .where(eq(courses.categoryId, categoryId))
-//       .where(eq(courses.isDeleted, false));
+// ─── Get Current Student's Enrolled Courses ───────────────────────────────────
 
-//     return {
-//       success: true,
-//       data: categoryCourses as Course[],
-//     };
-//   } catch (error) {
-//     console.error("Error getting courses by category:", error);
-//     return handleError(error) as ErrorResponse;
-//   }
-// }
+export async function getStudentCourses(
+  params: PaginatedSearchParams,
+): Promise<PaginatedResponse<StudentCourse>> {
+  const session = await auth();
 
-// // get Course by ID with category
-// export async function getCourseById(
-//   courseId: string,
-// ): Promise<ActionResponse<Course>> {
-//   try {
-//     const course = await db
-//       .select({
-//         id: courses.id,
-//         title: courses.title,
-//         description: courses.description,
-//         price: courses.price,
-//         isPublished: courses.isPublished,
-//         bannerUrl: courses.bannerUrl,
-//         duration: courses.duration,
-//         level: courses.level,
-//         categoryId: courses.categoryId,
-//         instructorId: courses.instructorId,
-//         isDeleted: courses.isDeleted,
-//         createdAt: courses.createdAt,
-//         updatedAt: courses.updatedAt,
-//         category: {
-//           id: categories.id,
-//           name: categories.name,
-//           description: categories.description,
-//           icon: categories.icon,
-//         },
-//       })
-//       .from(courses)
-//       .leftJoin(categories, eq(courses.categoryId, categories.id))
-//       .where(eq(courses.id, courseId))
-//       .limit(1);
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      error: "Unauthorized",
+      pagination: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0,
+        isNext: false,
+      },
+    };
+  }
 
-//     if (course.length === 0) {
-//       return handleError(new Error("Course not found")) as ErrorResponse;
-//     }
+  const validationResult = await action({
+    params,
+    schema: PaginatedSearchParamsSchema,
+  });
 
-//     return {
-//       success: true,
-//       data: course[0] as Course,
-//     };
-//   } catch (error) {
-//     console.error("Error getting course by ID:", error);
-//     return handleError(error) as ErrorResponse;
-//   }
-// }
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
 
-// Delete Course
+  const {
+    page = 1,
+    pageSize = 10,
+    query,
+    filter,
+    sort = "created-desc",
+  } = params;
+  const offset = (page - 1) * pageSize;
+
+  try {
+    const whereConditions = [
+      eq(enrollments.studentId, session.user.id),
+      eq(courses.isDeleted, false),
+    ];
+
+    if (query) {
+      const searchCondition = or(
+        ilike(courses.title, `%${query}%`),
+        ilike(courses.description, `%${query}%`),
+      );
+      if (searchCondition) whereConditions.push(searchCondition);
+    }
+
+    if (filter) whereConditions.push(eq(courses.categoryId, filter));
+
+    const orderByClause = buildCourseOrderBy(sort);
+
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(enrollments)
+      .innerJoin(courses, eq(enrollments.courseId, courses.id))
+      .where(and(...whereConditions));
+
+    const studentCourses = await db
+      .select({
+        ...getTableColumns(courses),
+        category: { ...getTableColumns(categories) },
+        enrolledAt: enrollments.enrolledAt,
+      })
+      .from(enrollments)
+      .innerJoin(courses, eq(enrollments.courseId, courses.id))
+      .leftJoin(categories, eq(courses.categoryId, categories.id))
+      .where(and(...whereConditions))
+      .orderBy(orderByClause)
+      .limit(pageSize)
+      .offset(offset);
+
+    return {
+      success: true,
+      data: studentCourses as StudentCourse[],
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+        isNext: total > page * pageSize,
+      },
+    };
+  } catch (error) {
+    console.error("Error getting student courses:", error);
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+// ─── Delete ───────────────────────────────────────────────────────────────────
+
 export async function deleteCourse(
   courseId: string,
 ): Promise<ActionResponse<Course>> {
   try {
-    const deletedCourse = await db
+    const [deletedCourse] = await db
       .delete(courses)
       .where(eq(courses.id, courseId))
       .returning();
 
-    if (deletedCourse.length === 0) {
+    if (!deletedCourse) {
       return handleError(new Error("Course not found")) as ErrorResponse;
     }
 
     revalidatePath("/admin/courses");
 
-    return {
-      success: true,
-      data: deletedCourse[0] as Course,
-    };
+    return { success: true, data: deletedCourse as Course };
   } catch (error) {
     console.error("Error deleting course:", error);
     return handleError(error) as ErrorResponse;
+  }
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function buildCourseOrderBy(sort: string) {
+  switch (sort) {
+    case "title-asc":
+      return asc(courses.title);
+    case "title-desc":
+      return desc(courses.title);
+    case "price-asc":
+      return asc(courses.price);
+    case "price-desc":
+      return desc(courses.price);
+    case "created-asc":
+      return asc(courses.createdAt);
+    case "created-desc":
+    default:
+      return desc(courses.createdAt);
   }
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { auth } from "@/auth";
 import {
   Achievement,
   CreateAchievementParams,
@@ -266,6 +267,160 @@ export async function earnAchievement(
   } catch (error) {
     console.error("Error earning achievement:", error);
     return { success: false, error: { message: "Failed to earn achievement" } };
+  }
+}
+
+// ─── Get Student Achievements ────────────────────────────────────────────────────
+
+export async function getStudentAchievements(
+  params: PaginatedSearchParams,
+): Promise<PaginatedResponse<StudentAchievement>> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      error: "Unauthorized",
+      pagination: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0,
+        isNext: false,
+      },
+    };
+  }
+
+  const validationResult = await action({
+    params,
+    schema: PaginatedSearchParamsSchema,
+  });
+
+  if (validationResult instanceof Error) {
+    return {
+      success: false,
+      error: "Validation failed",
+      pagination: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0,
+        isNext: false,
+      },
+    };
+  }
+
+  const { page = 1, pageSize = 10, query, sort = "created-desc" } = params;
+  const offset = (page - 1) * pageSize;
+
+  try {
+    // Only get achievements that the user has earned
+    const whereConditions = [
+      eq(studentAchievements.studentId, session.user.id),
+    ];
+
+    if (query) {
+      const searchCondition = or(
+        ilike(achievements.title, `%${query}%`),
+        ilike(achievements.description, `%${query}%`),
+      );
+      if (searchCondition) whereConditions.push(searchCondition);
+    }
+
+    // Build order by clause
+    let orderByClause;
+    switch (sort) {
+      case "title-asc":
+        orderByClause = asc(achievements.title);
+        break;
+      case "title-desc":
+        orderByClause = desc(achievements.title);
+        break;
+      case "points-asc":
+        orderByClause = asc(achievements.requiredPoints);
+        break;
+      case "points-desc":
+        orderByClause = desc(achievements.requiredPoints);
+        break;
+      case "created-desc":
+        orderByClause = desc(studentAchievements.earnedAt);
+        break;
+      case "created-asc":
+        orderByClause = asc(studentAchievements.earnedAt);
+        break;
+      default:
+        orderByClause = desc(studentAchievements.earnedAt);
+    }
+
+    // Get total count of earned achievements
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(studentAchievements)
+      .innerJoin(
+        achievements,
+        eq(studentAchievements.achievementId, achievements.id),
+      )
+      .where(and(...whereConditions));
+
+    const rows = await db
+      .select({
+        // Student achievement fields
+        id: studentAchievements.id,
+        studentId: studentAchievements.studentId,
+        achievementId: studentAchievements.achievementId,
+        earnedAt: studentAchievements.earnedAt,
+        // Achievement fields
+        achievement: {
+          id: achievements.id,
+          title: achievements.title,
+          description: achievements.description,
+          imageCldPubId: achievements.imageCldPubId,
+          requiredPoints: achievements.requiredPoints,
+        },
+      })
+      .from(studentAchievements)
+      .innerJoin(
+        achievements,
+        eq(studentAchievements.achievementId, achievements.id),
+      )
+      .where(and(...whereConditions))
+      .orderBy(orderByClause)
+      .limit(pageSize)
+      .offset(offset);
+
+    // Shape into StudentProject type structure
+    const data: StudentAchievement[] = rows.map((row) => ({
+      id: row.id,
+      studentId: row.studentId,
+      achievementId: row.achievementId,
+      earnedAt: row.earnedAt,
+      achievement: row.achievement,
+    }));
+
+    return {
+      success: true,
+      data,
+      pagination: {
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+        isNext: total > page * pageSize,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching student achievements:", error);
+    return {
+      success: false,
+      error: "Failed to fetch achievements",
+      pagination: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0,
+        isNext: false,
+      },
+    };
   }
 }
 

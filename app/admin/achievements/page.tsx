@@ -31,7 +31,11 @@ const AdminAchievements = async () => {
 
       <DataRenderer
         success={achievements.success}
-        error={achievements.error}
+        error={
+          typeof achievements.error === "string"
+            ? { message: achievements.error }
+            : achievements.error
+        }
         data={achievements.data}
         empty={EMPTY_ACHIEVEMENT}
         render={(data) => <AchievementsTableWrapper data={data} />}

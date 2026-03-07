@@ -13,15 +13,43 @@ import {
 } from "../validations";
 import handleError from "../handlers/error";
 import { db } from "../db";
-import { projects, courses } from "../schema";
-import { and, asc, desc, eq, ilike, or, getTableColumns } from "drizzle-orm";
+import { projects, courses, projectSubmissions } from "../schema";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  ilike,
+  or,
+  getTableColumns,
+} from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export type ProjectWithCourse = Project & {
+  courseTitle: string | null;
+};
+
+export type StudentProject = ProjectWithCourse & {
+  submission: {
+    id: string;
+    repoLink: string | null;
+    demoLink: string | null;
+    status: "pending" | "approved" | "rejected";
+    pointsEarned: number | null;
+    submittedAt: Date;
+  } | null;
+};
+
+// ─── Create ───────────────────────────────────────────────────────────────────
 
 export async function createProject(
   params: CreateProjectParams,
 ): Promise<ActionResponse<Project>> {
   try {
-    // Validate input parameters
     const validationResult = await action({
       params,
       schema: CreateProjectSchema,
@@ -33,65 +61,60 @@ export async function createProject(
     }
 
     if (!validationResult.params) {
-      return {
-        success: false,
-        error: "Invalid parameters provided",
-      };
+      return { success: false, error: "Invalid parameters provided" };
     }
 
     const { title, description, imageCldPubId, points, classId } =
       validationResult.params;
 
-    // Check if project with same title already exists
-    const existingProject = await db
-      .select()
+    const existing = await db
+      .select({ id: projects.id })
       .from(projects)
       .where(eq(projects.title, title))
       .limit(1);
 
-    if (existingProject.length > 0) {
+    if (existing.length > 0) {
       return {
         success: false,
         error: "A project with this title already exists",
       };
     }
 
-    // Create the project
-    const newProject = await db
+    const [newProject] = await db
       .insert(projects)
       .values({
         title,
         description: description || null,
-        imageCldPubId: imageCldPubId,
+        imageCldPubId,
         points: points || 50,
         courseId: classId,
       })
       .returning();
 
-    // Revalidate cache
     revalidatePath("/admin/projects");
     revalidatePath("/projects");
 
-    return {
-      success: true,
-      data: newProject[0],
-    };
+    return { success: true, data: newProject };
   } catch (error) {
     console.error("Error creating project:", error);
     return handleError(error) as ErrorResponse;
   }
 }
 
+// ─── Get All (admin) ──────────────────────────────────────────────────────────
+
 export async function getAllProjects(
   params: PaginatedSearchParams,
-): Promise<PaginatedResponse<Project>> {
+): Promise<PaginatedResponse<ProjectWithCourse>> {
   const validationResult = await action({
     params,
     schema: PaginatedSearchParamsSchema,
   });
+
   if (validationResult instanceof Error) {
     return handleError(validationResult) as ErrorResponse;
   }
+
   const {
     page = 1,
     pageSize = 10,
@@ -100,6 +123,7 @@ export async function getAllProjects(
     sort = "created-desc",
   } = params;
   const offset = (page - 1) * pageSize;
+
   try {
     const whereConditions = [eq(projects.isDeleted, false)];
 
@@ -108,39 +132,18 @@ export async function getAllProjects(
         ilike(projects.title, `%${query}%`),
         ilike(projects.description, `%${query}%`),
       );
-      if (searchCondition) {
-        whereConditions.push(searchCondition);
-      }
+      if (searchCondition) whereConditions.push(searchCondition);
     }
 
-    if (filter) {
-      whereConditions.push(eq(projects.courseId, filter));
-    }
+    if (filter) whereConditions.push(eq(projects.courseId, filter));
 
-    let orderByClause;
-    switch (sort) {
-      case "title-asc":
-        orderByClause = asc(projects.title);
-        break;
-      case "title-desc":
-        orderByClause = desc(projects.title);
-        break;
-      case "created-desc":
-        orderByClause = desc(projects.createdAt);
-        break;
-      case "created-asc":
-        orderByClause = asc(projects.createdAt);
-        break;
-      default:
-        orderByClause = desc(projects.createdAt);
-    }
+    const orderByClause = buildProjectOrderBy(sort);
 
-    const totalCountResult = await db
-      .select({ count: projects.id })
+    // Correct total count using count()
+    const [{ total }] = await db
+      .select({ total: count() })
       .from(projects)
       .where(and(...whereConditions));
-
-    const total = totalCountResult.length;
 
     const allProjects = await db
       .select({
@@ -154,19 +157,15 @@ export async function getAllProjects(
       .limit(pageSize)
       .offset(offset);
 
-    const totalPages = Math.ceil(total / pageSize);
-
-    const isNext = total > page * pageSize;
-
     return {
       success: true,
-      data: allProjects,
+      data: allProjects as ProjectWithCourse[],
       pagination: {
         total,
         page,
         pageSize,
-        totalPages,
-        isNext,
+        totalPages: Math.ceil(total / pageSize),
+        isNext: total > page * pageSize,
       },
     };
   } catch (error) {
@@ -175,149 +174,150 @@ export async function getAllProjects(
   }
 }
 
-// export async function getProjectById(
-//   projectId: string,
-// ): Promise<ActionResponse<Project>> {
-//   try {
-//     const project = await db
-//       .select()
-//       .from(projects)
-//       .where(eq(projects.id, projectId))
-//       .limit(1);
+// ─── Get Current Student's Projects (with submission status) ─────────────────
+// Returns all projects belonging to courses the student is enrolled in,
+// each annotated with the student's own submission if it exists.
 
-//     if (project.length === 0) {
-//       return {
-//         success: false,
-//         error: "Project not found",
-//       };
-//     }
+export async function getStudentProjects(
+  params: PaginatedSearchParams,
+): Promise<PaginatedResponse<StudentProject>> {
+  const session = await auth();
 
-//     return {
-//       success: true,
-//       data: project[0],
-//     };
-//   } catch (error) {
-//     console.error("Error fetching project:", error);
-//     return handleError(error) as ErrorResponse;
-//   }
-// }
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      error: "Unauthorized",
+      pagination: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0,
+        isNext: false,
+      },
+    };
+  }
 
-// export async function updateProject(
-//   projectId: string,
-//   params: Partial<CreateProjectParams>,
-// ): Promise<ActionResponse<Project>> {
-//   try {
-//     // Validate input parameters
-//     const validationResult = await action({
-//       params: { ...params, id: projectId },
-//       schema: CreateProjectSchema.partial(),
-//       authorize: true,
-//     });
+  const validationResult = await action({
+    params,
+    schema: PaginatedSearchParamsSchema,
+  });
 
-//     if (validationResult instanceof Error) {
-//       return handleError(validationResult) as ErrorResponse;
-//     }
+  if (validationResult instanceof Error) {
+    return handleError(validationResult) as ErrorResponse;
+  }
 
-//     const { title, description, imageCldPubId, points, classId } =
-//       validationResult.params;
+  const {
+    page = 1,
+    pageSize = 10,
+    query,
+    filter,
+    sort = "created-desc",
+  } = params;
+  const offset = (page - 1) * pageSize;
 
-//     // Check if project exists
-//     const existingProject = await db
-//       .select()
-//       .from(projects)
-//       .where(eq(projects.id, projectId))
-//       .limit(1);
+  try {
+    // Only get projects that the user has submitted
+    const whereConditions = [
+      eq(projectSubmissions.studentId, session.user.id),
+      eq(projects.isDeleted, false),
+    ];
 
-//     if (existingProject.length === 0) {
-//       return {
-//         success: false,
-//         error: "Project not found",
-//       };
-//     }
+    if (query) {
+      const searchCondition = or(
+        ilike(projects.title, `%${query}%`),
+        ilike(projects.description, `%${query}%`),
+      );
+      if (searchCondition) whereConditions.push(searchCondition);
+    }
 
-//     // Check if another project has the same title
-//     if (title && title !== existingProject[0].title) {
-//       const duplicateProject = await db
-//         .select()
-//         .from(projects)
-//         .where(eq(projects.title, title))
-//         .limit(1);
+    // filter = courseId
+    if (filter) whereConditions.push(eq(projects.courseId, filter));
 
-//       if (duplicateProject.length > 0) {
-//         return {
-//           success: false,
-//           error: "A project with this title already exists",
-//         };
-//       }
-//     }
+    const orderByClause = buildProjectOrderBy(sort);
 
-//     // Update the project
-//     const updatedProject = await db
-//       .update(projects)
-//       .set({
-//         ...(title && { title }),
-//         ...(description !== undefined && { description: description || null }),
-//         ...(imageCldPubId !== undefined && {
-//           imageCldPubId: imageCldPubId || null,
-//         }),
-//         ...(points !== undefined && { points: points || 50 }),
-//         ...(classId && { courseId: classId }),
-//         updatedAt: new Date(),
-//       })
-//       .where(eq(projects.id, projectId))
-//       .returning();
+    // Get total count of submitted projects
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(projectSubmissions)
+      .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
+      .where(and(...whereConditions));
 
-//     // Revalidate cache
-//     revalidatePath("/admin/projects");
-//     revalidatePath("/projects");
-//     revalidatePath(`/admin/projects/${projectId}`);
+    const rows = await db
+      .select({
+        ...getTableColumns(projects),
+        courseTitle: courses.title,
+        // submission fields (always present since we're joining submissions)
+        submissionId: projectSubmissions.id,
+        repoLink: projectSubmissions.repoLink,
+        demoLink: projectSubmissions.demoLink,
+        submissionStatus: projectSubmissions.status,
+        pointsEarned: projectSubmissions.pointsEarned,
+        submittedAt: projectSubmissions.submittedAt,
+      })
+      .from(projectSubmissions)
+      .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
+      .leftJoin(courses, eq(projects.courseId, courses.id))
+      .where(and(...whereConditions))
+      .orderBy(orderByClause)
+      .limit(pageSize)
+      .offset(offset);
 
-//     return {
-//       success: true,
-//       data: updatedProject[0],
-//     };
-//   } catch (error) {
-//     console.error("Error updating project:", error);
-//     return handleError(error) as ErrorResponse;
-//   }
-// }
+    // Shape into StudentProject
+    const data: StudentProject[] = rows.map((row) => {
+      const {
+        submissionId,
+        repoLink,
+        demoLink,
+        submissionStatus,
+        pointsEarned,
+        submittedAt,
+        courseTitle,
+        ...projectFields
+      } = row;
 
-// export async function deleteProject(
-//   projectId: string,
-// ): Promise<ActionResponse<void>> {
-//   try {
-//     // Check if project exists
-//     const existingProject = await db
-//       .select()
-//       .from(projects)
-//       .where(eq(projects.id, projectId))
-//       .limit(1);
+      return {
+        ...projectFields,
+        courseTitle,
+        submission: {
+          id: submissionId,
+          repoLink,
+          demoLink,
+          status: submissionStatus!,
+          pointsEarned,
+          submittedAt: submittedAt!,
+        },
+      };
+    });
 
-//     if (existingProject.length === 0) {
-//       return {
-//         success: false,
-//         error: "Project not found",
-//       };
-//     }
+    return {
+      success: true,
+      data,
+      pagination: {
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+        isNext: total > page * pageSize,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching student projects:", error);
+    return handleError(error) as ErrorResponse;
+  }
+}
 
-//     // Soft delete the project
-//     await db
-//       .update(projects)
-//       .set({
-//         isDeleted: true,
-//         updatedAt: new Date(),
-//       })
-//       .where(eq(projects.id, projectId));
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-//     // Revalidate cache
-//     revalidatePath("/admin/projects");
-//     revalidatePath("/projects");
-
-//     return {
-//       success: true,
-//     };
-//   } catch (error) {
-//     console.error("Error deleting project:", error);
-//     return handleError(error) as ErrorResponse;
-//   }
-// }
+function buildProjectOrderBy(sort: string) {
+  switch (sort) {
+    case "title-asc":
+      return asc(projects.title);
+    case "title-desc":
+      return desc(projects.title);
+    case "created-asc":
+      return asc(projects.createdAt);
+    case "created-desc":
+    default:
+      return desc(projects.createdAt);
+  }
+}

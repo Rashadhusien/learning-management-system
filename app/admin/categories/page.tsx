@@ -29,7 +29,11 @@ const AdminCategories = async () => {
       {/* Categories Table */}
       <DataRenderer
         success={categories.success}
-        error={categories.error}
+        error={
+          typeof categories.error === "string"
+            ? { message: categories.error }
+            : categories.error
+        }
         data={categories.data}
         empty={EMYPTY_CATEGORY}
         render={(data) => <CategoriesTableWrapper data={data} />}

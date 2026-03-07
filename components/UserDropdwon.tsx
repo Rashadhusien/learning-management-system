@@ -10,11 +10,14 @@ import {
 import {
   BadgeCheckIcon,
   BellIcon,
+  BookOpenIcon,
   ChevronDownIcon,
   ChevronRightIcon,
   CreditCardIcon,
+  FolderIcon,
   LayoutDashboardIcon,
   LogOutIcon,
+  TrophyIcon,
 } from "lucide-react";
 import UserAvatar from "./UserAvatar";
 import { auth } from "@/auth";
@@ -66,18 +69,33 @@ export async function UserDropdown({
               Profile
             </Link>
           </DropdownMenuItem>
-          {/*  <DropdownMenuItem asChild>
-            <Link href="/billing" className="flex items-center gap-2">
-              <CreditCardIcon className="h-4 w-4" />
-              Billing
+          <DropdownMenuItem asChild>
+            <Link
+              href={ROUTES.PROFILE_COURSES}
+              className="flex items-center gap-2"
+            >
+              <BookOpenIcon className="h-4 w-4" />
+              My Courses
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/notifications" className="flex items-center gap-2">
-              <BellIcon className="h-4 w-4" />
-              Notifications
+            <Link
+              href={ROUTES.PROFILE_PROJECTS}
+              className="flex items-center gap-2"
+            >
+              <FolderIcon className="h-4 w-4" />
+              My Projects
             </Link>
-          </DropdownMenuItem> */}
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link
+              href={ROUTES.PROFILE_ACHIEVEMENTS}
+              className="flex items-center gap-2"
+            >
+              <TrophyIcon className="h-4 w-4" />
+              My Achievements
+            </Link>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
