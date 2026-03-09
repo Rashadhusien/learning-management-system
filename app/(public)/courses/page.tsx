@@ -29,7 +29,7 @@ const Courses = async ({ searchParams }: SearchParams) => {
         description="Learn programming step-by-step with real-world examples and projects"
       />
 
-      <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
+      <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center mx-3 sm:mx-12">
         <LocalSearch
           route={ROUTES.COURSES}
           iconPosition="left"
@@ -43,7 +43,7 @@ const Courses = async ({ searchParams }: SearchParams) => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  mt-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-3  mt-10">
         <DataRenderer
           success={success}
           error={typeof error === "string" ? { message: error } : error}

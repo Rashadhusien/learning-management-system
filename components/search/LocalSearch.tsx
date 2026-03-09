@@ -52,7 +52,7 @@ const LocalSearch = ({
 
   return (
     <InputGroup
-      className={` ${otherClasses}  flex min-h-[56px] grow items-center gap-2 px-4 max-w-lg`}
+      className={` ${otherClasses}  flex min-h-[56px] grow items-center gap-2 px-4 sm:max-w-lg `}
     >
       {iconPosition === "left" && <Search className="w-5 h-5 text-gray-500" />}
       <Input
@@ -60,7 +60,7 @@ const LocalSearch = ({
         placeholder={placeholder}
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="paragraph-regular no-focus placholder border-none shadow-none outline-none "
+        className="paragraph-regular no-focus placholder border-none shadow-none outline-none w-full"
       />
       {iconPosition === "right" && <Search className="w-5 h-5 text-gray-500" />}
     </InputGroup>

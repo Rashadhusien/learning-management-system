@@ -13,17 +13,26 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { CLOUDINARY_CLOUD_NAME } from "@/constants";
 import { CldImage } from "next-cloudinary";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function StudentTable({
   data,
   onView,
   onEdit,
   onDelete,
+  onToggleActive,
 }: {
   data: User[];
   onView?: (student: User) => void;
   onEdit?: (student: User) => void;
   onDelete?: (student: User) => void;
+  onToggleActive?: (student: User) => void;
 }) {
   const columns: ColumnDef<User>[] = [
     {
@@ -83,10 +92,21 @@ export function StudentTable({
       header: "Active",
       cell: ({ row }) => {
         const active = row.getValue("active") as boolean;
-        return active ? (
-          <Badge variant="secondary">Active</Badge>
-        ) : (
-          <Badge variant="destructive">Inactive</Badge>
+        return (
+          <Select
+            value={active ? "active" : "inactive"}
+            onValueChange={(value) =>
+              onToggleActive?.({ ...row.original, active: value === "active" })
+            }
+          >
+            <SelectTrigger className="w-full max-w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
         );
       },
     },

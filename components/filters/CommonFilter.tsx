@@ -51,7 +51,7 @@ const CommonFilter = ({
       <Select onValueChange={handleUpdateParams} value={paramsFilter || ""}>
         <SelectTrigger
           className={cn(
-            "body-regular no-focus light-border background-light800_dark300 text-dark500_light700 px-5 py-2.5",
+            "body-regular no-focus light-border max-sm:w-full px-5 py-2.5",
             otherClasses,
           )}
           aria-label="Filter Options"

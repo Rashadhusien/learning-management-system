@@ -2,6 +2,7 @@
 import { CldImage } from "next-cloudinary";
 import { User } from "@/types/action";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 
 const ProfileHeader = ({ userProfile }: { userProfile: User | null }) => {
   console.log(userProfile);
@@ -61,10 +62,15 @@ const ProfileHeader = ({ userProfile }: { userProfile: User | null }) => {
 
           {/* User Info */}
           <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl font-bold">
-              {userProfile.name}
+            <h1 className="text-2xl sm:text-3xl font-bold ">
+              {userProfile.name}{" "}
             </h1>
-            <p className="text-muted-foreground">@{userProfile.username}</p>
+            <p className=" flex items-center gap-2">
+              <Badge variant={"outline"}>@{userProfile.username} </Badge>
+              <Badge variant={userProfile.active ? "default" : "destructive"}>
+                {userProfile.active ? "Active" : "Inactive"}
+              </Badge>{" "}
+            </p>
           </div>
 
           {/* Action Buttons */}

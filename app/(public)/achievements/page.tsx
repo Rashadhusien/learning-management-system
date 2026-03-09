@@ -24,13 +24,13 @@ const Achievements = async ({ searchParams }: SearchParams) => {
   });
 
   return (
-    <section className="container mx-auto my-8">
+    <section className="container mx-auto ">
       <SectionTitle
         title="Achievements"
         description="Collect badges and trophies as you complete courses."
       />
 
-      <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
+      <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center mx-3 sm:mx-12">
         <LocalSearch
           route={ROUTES.ACHIEVEMENTS}
           iconPosition="left"

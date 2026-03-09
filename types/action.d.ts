@@ -46,6 +46,7 @@ export interface User {
   coverCldPubId?: string | null;
   imageCldPubId?: string | null;
   image?: string;
+  active: boolean;
   isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;

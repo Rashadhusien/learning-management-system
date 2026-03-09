@@ -6,6 +6,8 @@ import { PaginatedSearchParamsSchema } from "../validations";
 import { and, asc, desc, eq, ilike, or, getTableColumns } from "drizzle-orm";
 import { users } from "../schema";
 import { db } from "../db";
+import { revalidatePath } from "next/cache";
+import { ROUTES } from "@/constants/routes";
 
 export async function getAllStudents(
   params: PaginatedSearchParams,
@@ -141,6 +143,56 @@ export async function deleteStudent(
     return {
       success: false,
       error: "Failed to delete student",
+    };
+  }
+}
+
+export async function toggleStudentActive(
+  studentId: string,
+): Promise<ActionResponse<void>> {
+  try {
+    // Get current student to determine new active value
+    const currentStudent = await db
+      .select({ active: users.active })
+      .from(users)
+      .where(eq(users.id, studentId))
+      .limit(1);
+
+    if (currentStudent.length === 0) {
+      return {
+        success: false,
+        error: "Student not found",
+      };
+    }
+
+    // Toggle the active status
+    const toggledStudent = await db
+      .update(users)
+      .set({
+        active: !currentStudent[0].active,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, studentId))
+      .returning();
+
+    if (toggledStudent.length === 0) {
+      return {
+        success: false,
+        error: "Student not found",
+      };
+    }
+
+    // Revalidate cache
+    revalidatePath(ROUTES.ADMIN_STUDENTS);
+    revalidatePath(ROUTES.PROFILE);
+
+    return {
+      success: true,
+    };
+  } catch {
+    return {
+      success: false,
+      error: "Failed to toggle student active",
     };
   }
 }

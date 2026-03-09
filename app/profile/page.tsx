@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { getProfile } from "@/lib/actions/profile.action";
 const StudentPage = async () => {
   const session = await auth();
