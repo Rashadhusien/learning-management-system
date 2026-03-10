@@ -77,6 +77,6 @@ export const adminLinks = [
   {
     imgUrl: "/icons/leaderboard.svg",
     route: ROUTES.ADMIN_LEADERBOARD,
-    label: "Leaderboard",
+    label: " Submissions",
   },
 ];

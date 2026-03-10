@@ -96,8 +96,8 @@ export async function createCourse(
 // ─── Get All (admin / public browse) ─────────────────────────────────────────
 
 export async function getAllCourses(
-  params: PaginatedSearchParams,
-): Promise<PaginatedResponse<CourseWithCategory>> {
+  params?: PaginatedSearchParams,
+): Promise<PaginatedResponse<CourseWithCategory> | ErrorResponse> {
   const validationResult = await action({
     params,
     schema: PaginatedSearchParamsSchema,

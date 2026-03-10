@@ -1,5 +1,6 @@
 import DataRenderer from "@/components/DataRenderer";
 import ProjectCard from "@/components/cards/ProjectCard";
+import SubmitProjectDialog from "@/components/submit-project-dialg";
 import { Card } from "@/components/ui/card";
 import { EMPTY_PROJECT } from "@/constants/states";
 import { getStudentProjects } from "@/lib/actions/projects.action";
@@ -17,11 +18,15 @@ const ProfileProjects = async (searchParams: {
   return (
     <section className="p-6">
       <Card className="mt-8">
-        <div className="p-6">
-          <h2 className="text-2xl md:text-3xl font-semibold">My Projects</h2>
-          <p className="text-muted-foreground mt-2">
-            You can always upload your projects here
-          </p>
+        <div className="p-6 flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-semibold">My Projects</h2>
+            <p className="text-muted-foreground mt-2">
+              You can always upload your projects here
+            </p>
+          </div>
+
+          <SubmitProjectDialog />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  mt-10">

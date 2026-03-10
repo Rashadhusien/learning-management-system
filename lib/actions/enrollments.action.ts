@@ -25,6 +25,20 @@ export async function enrollInCourse(
   }
 
   try {
+    // check if user active
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
+
+    if (!existingUser.active) {
+      return {
+        success: false,
+        error: "User not Active",
+      };
+    }
+
     // Check if course exists and is published
     const course = await db
       .select({ id: courses.id, isPublished: courses.isPublished })

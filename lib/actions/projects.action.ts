@@ -5,6 +5,7 @@ import {
   CreateProjectParams,
   PaginatedResponse,
   Project,
+  SubmitProjectParams,
 } from "@/types/action";
 import action from "../handlers/action";
 import {
@@ -341,6 +342,38 @@ export async function getProjectById(
     };
   } catch (error) {
     console.error("Error getting project by ID:", error);
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+// Get Projects By course
+export async function getProjectsByCourse(
+  courseId: string,
+): Promise<ActionResponse<Project[]>> {
+  // Validate UUID format
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(courseId)) {
+    return {
+      success: false,
+      error: "Invalid course ID format",
+    };
+  }
+
+  try {
+    const courseProjects = await db
+      .select()
+      .from(projects)
+      .where(
+        and(eq(projects.courseId, courseId), eq(projects.isDeleted, false)),
+      );
+
+    return {
+      success: true,
+      data: courseProjects,
+    };
+  } catch (error) {
+    console.error("Error getting projects by course:", error);
     return handleError(error) as ErrorResponse;
   }
 }

@@ -158,3 +158,10 @@ export interface Course {
     icon?: string;
   };
 }
+
+export interface SubmitProjectParams {
+  courseId: string;
+  projectId: string;
+  repoLink?: string;
+  demoLink?: string;
+}

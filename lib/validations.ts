@@ -100,6 +100,13 @@ export const CreateProjectSchema = z.object({
   classId: z.string().min(1, { message: "Class is required." }),
 });
 
+export const SubmitProjectSchema = z.object({
+  courseId: z.string().min(1, { message: "Course is required." }),
+  projectId: z.string().min(1, { message: "Project is required." }),
+  repoLink: z.string().optional(),
+  demoLink: z.string().min(1, { message: "Demo link is required." }),
+});
+
 export const GetProfileSchema = z.object({
   userId: z.string().min(1, { message: "User Id is Required" }),
 });

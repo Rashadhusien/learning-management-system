@@ -9,7 +9,7 @@ import { getProjectSubmissions } from "@/lib/actions/project-submissions.action"
 import { ROUTES } from "@/constants/routes";
 import { ArrowLeft, Clock, Trophy, FolderOpen, Users } from "lucide-react";
 import ProjectSubmissionsTable from "@/components/ProjectSubmissionsTable";
-
+import SubmitProjectDialog from "@/components/submit-project-dialg";
 interface ProjectDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -34,6 +34,8 @@ const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
   if (!success || !project) {
     notFound();
   }
+
+  console.log(submissions);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -149,9 +151,7 @@ const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
                 </Badge>
               </div>
 
-              <Button className="w-full" size="lg">
-                Submit Project
-              </Button>
+              <SubmitProjectDialog />
             </CardContent>
           </Card>
         </div>

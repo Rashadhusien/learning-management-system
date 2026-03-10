@@ -5,7 +5,7 @@ import { db } from "../db";
 import { projectSubmissions, projects, users } from "../schema";
 import { revalidatePath } from "next/cache";
 import handleError from "../handlers/error";
-import { ActionResponse } from "@/types/action.d";
+import { ActionResponse, SubmitProjectParams } from "@/types/action.d";
 import { auth } from "@/auth";
 import { eq, and, or, ilike, desc, count } from "drizzle-orm";
 
@@ -14,27 +14,32 @@ import { eq, and, or, ilike, desc, count } from "drizzle-orm";
 export async function getProjectSubmissions(
   projectId: string,
   params: { page?: number; pageSize?: number; query?: string } = {},
-): Promise<ActionResponse<Array<{
-  student: {
-    id: string;
-    name: string;
-    username: string;
-    email: string;
-    image?: string;
-    totalPoints: number;
-  };
-  submission: {
-    id: string;
-    repoLink: string | null;
-    demoLink: string | null;
-    status: "pending" | "approved" | "rejected";
-    pointsEarned: number | null;
-    submittedAt: Date;
-  };
-  totalProjects: number;
-}>>> {
+): Promise<
+  ActionResponse<
+    Array<{
+      student: {
+        id: string;
+        name: string;
+        username: string;
+        email: string;
+        image?: string;
+        totalPoints: number;
+      };
+      submission: {
+        id: string;
+        repoLink: string | null;
+        demoLink: string | null;
+        status: "pending" | "approved" | "rejected";
+        pointsEarned: number | null;
+        submittedAt: Date;
+      };
+      totalProjects: number;
+    }>
+  >
+> {
   // Validate UUID format
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   if (!uuidRegex.test(projectId)) {
     return {
       success: false,
@@ -147,6 +152,95 @@ export async function getStudentProjectSubmissions(): Promise<
     };
   } catch (error) {
     console.error("Error getting student project submissions:", error);
+    return handleError(error) as ErrorResponse;
+  }
+}
+
+// ─── Submit Project ─────────────────────────────────────────────────────────────
+
+export async function submitProject(
+  params: SubmitProjectParams,
+): Promise<ActionResponse<void>> {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      error: "You must be logged in to submit a project",
+    };
+  }
+
+  // Validate UUID format for projectId
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(params.projectId)) {
+    return {
+      success: false,
+      error: "Invalid project ID format",
+    };
+  }
+
+  // Validate required fields
+  if (!params.demoLink?.trim()) {
+    return {
+      success: false,
+      error: "Demo link is required",
+    };
+  }
+
+  try {
+    // check if user active
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
+
+    if (!existingUser.active) {
+      return {
+        success: false,
+        error: "User not Active",
+      };
+    }
+    // Check if student has already submitted this project
+    const existingSubmission = await db
+      .select()
+      .from(projectSubmissions)
+      .where(
+        and(
+          eq(projectSubmissions.studentId, session.user.id),
+          eq(projectSubmissions.projectId, params.projectId),
+        ),
+      )
+      .limit(1);
+
+    if (existingSubmission.length > 0) {
+      return {
+        success: false,
+        error: "You have already submitted this project",
+      };
+    }
+
+    // Create new submission
+    await db.insert(projectSubmissions).values({
+      projectId: params.projectId,
+      studentId: session.user.id,
+      repoLink: params.repoLink?.trim() || null,
+      demoLink: params.demoLink?.trim(),
+      status: "pending",
+      pointsEarned: null,
+    });
+
+    // Revalidate cache
+    revalidatePath("/projects");
+    revalidatePath("/profile/projects");
+    revalidatePath(`/projects/${params.projectId}`);
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error submitting project:", error);
     return handleError(error) as ErrorResponse;
   }
 }
