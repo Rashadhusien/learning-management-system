@@ -284,6 +284,49 @@ export async function deleteCourse(
   }
 }
 
+// ─── Get Course by ID ────────────────────────────────────────────────────────────
+
+export async function getCourseById(
+  courseId: string,
+): Promise<ActionResponse<CourseWithCategory>> {
+  // Validate UUID format
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(courseId)) {
+    return {
+      success: false,
+      error: "Invalid course ID format",
+    };
+  }
+
+  try {
+    const course = await db
+      .select({
+        ...getTableColumns(courses),
+        category: { ...getTableColumns(categories) },
+      })
+      .from(courses)
+      .leftJoin(categories, eq(courses.categoryId, categories.id))
+      .where(and(eq(courses.id, courseId), eq(courses.isDeleted, false)))
+      .limit(1);
+
+    if (course.length === 0) {
+      return {
+        success: false,
+        error: "Course not found",
+      };
+    }
+
+    return {
+      success: true,
+      data: course[0] as CourseWithCategory,
+    };
+  } catch (error) {
+    console.error("Error getting course by ID:", error);
+    return handleError(error) as ErrorResponse;
+  }
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function buildCourseOrderBy(sort: string) {

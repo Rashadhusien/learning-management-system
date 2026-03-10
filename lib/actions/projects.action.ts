@@ -306,6 +306,45 @@ export async function getStudentProjects(
   }
 }
 
+// ─── Get Project by ID ────────────────────────────────────────────────────────────
+
+export async function getProjectById(
+  projectId: string,
+): Promise<ActionResponse<Project>> {
+  // Validate UUID format
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(projectId)) {
+    return {
+      success: false,
+      error: "Invalid project ID format",
+    };
+  }
+
+  try {
+    const project = await db
+      .select()
+      .from(projects)
+      .where(and(eq(projects.id, projectId), eq(projects.isDeleted, false)))
+      .limit(1);
+
+    if (project.length === 0) {
+      return {
+        success: false,
+        error: "Project not found",
+      };
+    }
+
+    return {
+      success: true,
+      data: project[0],
+    };
+  } catch (error) {
+    console.error("Error getting project by ID:", error);
+    return handleError(error) as ErrorResponse;
+  }
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function buildProjectOrderBy(sort: string) {

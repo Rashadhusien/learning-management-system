@@ -1,6 +1,6 @@
 "use client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { formUrlQuery, removeKeysFromUrlQuery } from "@/lib/url";
 import { InputGroup } from "../ui/input-group";
@@ -24,31 +24,45 @@ const LocalSearch = ({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const query = searchParams.get("query") || "";
+  // Use refs to store stable values
+  const routerRef = useRef(router);
+  const pathnameRef = useRef(pathname);
+  const routeRef = useRef(route);
 
+  // Update refs when values change
+  useEffect(() => {
+    routerRef.current = router;
+    pathnameRef.current = pathname;
+    routeRef.current = route;
+  }, [router, pathname, route]);
+
+  const query = searchParams.get("query") || "";
   const [searchQuery, setSearchQuery] = useState(query);
+
+  // Memoize searchParams string to prevent unnecessary re-renders
+  const searchParamsString = searchParams.toString();
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (searchQuery) {
         const newUrl = formUrlQuery({
-          params: searchParams.toString(),
+          params: searchParamsString,
           key: "query",
           value: searchQuery,
         });
-        router.push(newUrl, { scroll: false });
+        routerRef.current.push(newUrl, { scroll: false });
       } else {
-        if (pathname === route) {
+        if (pathnameRef.current === routeRef.current) {
           const newUrl = removeKeysFromUrlQuery({
-            params: searchParams.toString(),
+            params: searchParamsString,
             keysToRemove: ["query"],
           });
-          router.push(newUrl, { scroll: false });
+          routerRef.current.push(newUrl, { scroll: false });
         }
       }
       return () => clearTimeout(delayDebounce);
     }, 300);
-  }, [searchQuery, router, route, searchParams, pathname]);
+  }, [searchQuery, searchParamsString]); // Depend on memoized searchParamsString
 
   return (
     <InputGroup

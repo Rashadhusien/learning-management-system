@@ -9,7 +9,7 @@ type ActionResponse<T = null> = {
 };
 
 type SuccessResponse<T = null> = ActionResponse<T> & { success: true };
-type ErrorResponse = ActionResponse<undefined> & { success: false };
+type ErrorResponse = ActionResponse<undefined | void> & { success: false };
 
 type APIErrorResponse = NextResponse<ErrorResponse>;
 type APIResponse<T = null> = NextResponse<SuccessResponse<T> | ErrorResponse>;
