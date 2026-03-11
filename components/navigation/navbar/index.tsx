@@ -6,6 +6,7 @@ import { ROUTES } from "@/constants/routes";
 import MobileNavigation from "./MobileNavigation";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const Navbar = async () => {
   const session = await auth();
@@ -32,7 +33,8 @@ const Navbar = async () => {
           <div className="lg:hidden">
             <ModeToggle />
           </div>
-          <MobileNavigation />
+          <SidebarTrigger />
+          {/* <MobileNavigation /> */}
         </div>
       </div>
     </nav>

@@ -5,6 +5,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import Script from "next/script";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 // const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -48,7 +49,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>
         <Toaster richColors />
       </body>
