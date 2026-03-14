@@ -165,3 +165,29 @@ export interface SubmitProjectParams {
   repoLink?: string;
   demoLink?: string;
 }
+
+export interface ProjectSubmissionParams {
+  student: {
+    id: string;
+    name: string;
+    username: string;
+    email: string;
+    image?: string;
+    totalPoints: number;
+  };
+  submission: {
+    id: string;
+    repoLink: string | null;
+    demoLink: string | null;
+    status: "pending" | "approved" | "rejected";
+    pointsEarned: number | null;
+    submittedAt: Date;
+  };
+  project: {
+    id: string;
+    title: string;
+    imageCldPubId: string | null;
+    points: number;
+  };
+  totalProjects: number;
+}

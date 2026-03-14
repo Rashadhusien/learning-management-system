@@ -35,7 +35,9 @@ const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
     notFound();
   }
 
-  console.log(submissions);
+  // console.log(submissions);
+
+  console.log(project);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -70,7 +72,7 @@ const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
           </Card>
 
           {/* Project Info Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2  gap-4 mb-8">
             <Card>
               <CardContent className="p-4 text-center">
                 <Trophy className="w-6 h-6 mx-auto mb-2 text-yellow-500" />
@@ -85,20 +87,6 @@ const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
                 <p className="font-semibold">
                   {submissions?.length || 0} Students
                 </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <FolderOpen className="w-6 h-6 mx-auto mb-2 text-green-500" />
-                <p className="text-sm text-muted-foreground">Category</p>
-                <p className="font-semibold">Development</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <Clock className="w-6 h-6 mx-auto mb-2 text-orange-500" />
-                <p className="text-sm text-muted-foreground">Duration</p>
-                <p className="font-semibold">2 weeks</p>
               </CardContent>
             </Card>
           </div>

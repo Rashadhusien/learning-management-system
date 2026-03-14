@@ -17,7 +17,7 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
   if (session.user.role !== "admin") notFound();
 
   return (
-    <SidebarProvider>
+    <>
       <AdminSidebar />
       <SidebarInset className="overflow-hidden">
         <div className="flex items-center gap-2 px-4 py-2 border-b shrink-0">
@@ -28,7 +28,7 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
           <div className="mx-auto w-full max-w-7xl">{children}</div>
         </main>
       </SidebarInset>
-    </SidebarProvider>
+    </>
   );
 };
 

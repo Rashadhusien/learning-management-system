@@ -34,7 +34,6 @@ const Navbar = async () => {
             <ModeToggle />
           </div>
           <SidebarTrigger />
-          {/* <MobileNavigation /> */}
         </div>
       </div>
     </nav>

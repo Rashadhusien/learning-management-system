@@ -5,9 +5,81 @@ import { db } from "../db";
 import { projectSubmissions, projects, users } from "../schema";
 import { revalidatePath } from "next/cache";
 import handleError from "../handlers/error";
-import { ActionResponse, SubmitProjectParams } from "@/types/action.d";
+import {
+  ActionResponse,
+  SubmitProjectParams,
+  ErrorResponse,
+  ProjectSubmissionParams,
+} from "@/types/action.d";
 import { auth } from "@/auth";
-import { eq, and, or, ilike, desc, count } from "drizzle-orm";
+import { eq, and, or, ilike, desc, count, sql } from "drizzle-orm";
+
+// ─── Get Projects Submissions ─────────────────────────────────────────────────────
+
+export async function getProjectsSubmissions(
+  params: PaginatedSearchParams,
+): Promise<ActionResponse<ProjectSubmissionParams[]>> {
+  try {
+    const { page = 1, pageSize = 10, query = "" } = params;
+    const offset = (page - 1) * pageSize;
+
+    // Build base query conditions for approved submissions only
+    const whereConditions = [];
+
+    if (query) {
+      const searchCondition = or(
+        ilike(users.name, `%${query}%`),
+        ilike(users.username, `%${query}%`),
+        ilike(users.email, `%${query}%`),
+      );
+      if (searchCondition) whereConditions.push(searchCondition);
+    }
+
+    // Get submissions with student data and project counts in a single query
+    const submissionsData = await db
+      .select({
+        student: {
+          id: users.id,
+          name: users.name,
+          username: users.username,
+          email: users.email,
+          image: users.imageCldPubId || undefined,
+          totalPoints: users.totalPoints,
+        },
+        submission: {
+          id: projectSubmissions.id,
+          repoLink: projectSubmissions.repoLink,
+          demoLink: projectSubmissions.demoLink,
+          status: projectSubmissions.status,
+          pointsEarned: projectSubmissions.pointsEarned,
+          submittedAt: projectSubmissions.submittedAt,
+        },
+        project: {
+          id: projects.id,
+          title: projects.title,
+          imageCldPubId: projects.imageCldPubId,
+          points: projects.points,
+        },
+        totalProjects: count(projectSubmissions.id),
+      })
+      .from(projectSubmissions)
+      .innerJoin(users, eq(projectSubmissions.studentId, users.id))
+      .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
+      .where(and(...whereConditions))
+      .groupBy(users.id, projectSubmissions.id, projects.id)
+      .orderBy(desc(projectSubmissions.submittedAt))
+      .limit(pageSize)
+      .offset(offset);
+
+    return {
+      success: true,
+      data: submissionsData,
+    };
+  } catch (error) {
+    console.error("Error getting project submissions:", error);
+    return handleError(error);
+  }
+}
 
 // ─── Get Project Submissions ─────────────────────────────────────────────────────
 
@@ -153,6 +225,114 @@ export async function getStudentProjectSubmissions(): Promise<
   } catch (error) {
     console.error("Error getting student project submissions:", error);
     return handleError(error) as ErrorResponse;
+  }
+}
+
+// ─── Update Project Submission Status ─────────────────────────────────────────────
+
+export async function updateProjectSubmissionStatus(
+  submission: ProjectSubmission,
+): Promise<ActionResponse<void>> {
+  console.log(submission);
+  const submissionId = submission.submission.id;
+  const status = submission.submission.status;
+  const pointsEarned = submission.project.points;
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      error: "Unauthorized",
+    };
+  }
+
+  // Check if user is admin
+  if (session.user.role !== "admin") {
+    return {
+      success: false,
+      error: "Only admins can update submission status",
+    };
+  }
+
+  // Validate UUID format for submissionId
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidRegex.test(submissionId)) {
+    return {
+      success: false,
+      error: "Invalid submission ID format",
+    };
+  }
+
+  try {
+    // Get the submission to check current status and project info
+    const [existingSubmission] = await db
+      .select({
+        id: projectSubmissions.id,
+        currentStatus: projectSubmissions.status,
+        projectId: projectSubmissions.projectId,
+        studentId: projectSubmissions.studentId,
+        pointsEarned: projectSubmissions.pointsEarned,
+      })
+      .from(projectSubmissions)
+      .where(eq(projectSubmissions.id, submissionId))
+      .limit(1);
+
+    if (!existingSubmission) {
+      return {
+        success: false,
+        error: "Submission not found",
+      };
+    }
+
+    // Update the submission
+    await db
+      .update(projectSubmissions)
+      .set({
+        status,
+        pointsEarned: status === "approved" ? pointsEarned || 0 : null,
+      })
+      .where(eq(projectSubmissions.id, submissionId));
+
+    // If approved, update student's total points
+    if (status === "approved" && pointsEarned && pointsEarned > 0) {
+      await db
+        .update(users)
+        .set({
+          totalPoints: sql`${users.totalPoints} + ${pointsEarned}`,
+        })
+        .where(eq(users.id, existingSubmission.studentId));
+    }
+    // If changing from approved to something else, subtract the points
+    else if (
+      existingSubmission.currentStatus === "approved" &&
+      existingSubmission.pointsEarned &&
+      status !== "approved"
+    ) {
+      await db
+        .update(users)
+        .set({
+          totalPoints: sql`${users.totalPoints} - ${existingSubmission.pointsEarned}`,
+        })
+        .where(eq(users.id, existingSubmission.studentId));
+    }
+
+    // If fisrt submistion update achivemnt
+    // TODO: Update achievement
+    // check if this is the first approved project to earn the Projects Starter points and acheivment
+
+    // Revalidate cache
+    revalidatePath("/admin/projects");
+    revalidatePath("/admin/projects/submissions");
+    revalidatePath(`/projects/${existingSubmission.projectId}`);
+    revalidatePath("/profile/projects");
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error updating submission status:", error);
+    return handleError(error);
   }
 }
 

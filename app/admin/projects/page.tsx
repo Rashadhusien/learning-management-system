@@ -5,12 +5,21 @@ import DataRenderer from "@/components/DataRenderer";
 import { EMYPTY_COURSE } from "@/constants/states";
 import { getAllProjects } from "@/lib/actions/projects.action";
 import { ProjectTableWrapper } from "@/components/tables/Admin/projects/ProjectsTableWrapper";
+import { Separator } from "@/components/ui/separator";
+import { getProjectsSubmissions } from "@/lib/actions/project-submissions.action";
+import { ProjectSubmissionTableWrapper } from "@/components/tables/Admin/projects/ProjectSubmissionTableWrapper";
 
 const AdminProjects = async () => {
   const projects = await getAllProjects({
     page: 1,
     pageSize: 10,
   });
+  const projectsSubmissions = await getProjectsSubmissions({
+    page: 1,
+    pageSize: 10,
+  });
+
+  console.log(projectsSubmissions);
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -35,6 +44,27 @@ const AdminProjects = async () => {
         data={projects.data}
         empty={EMYPTY_COURSE}
         render={(data) => <ProjectTableWrapper data={data} />}
+      />
+
+      <Separator />
+
+      <div>
+        <h1 className="text-3xl font-bold">Projects Submissions</h1>
+        <p className="text-muted-foreground">
+          Manage all projects submissions and student progress
+        </p>
+      </div>
+
+      <DataRenderer
+        success={projectsSubmissions.success}
+        error={
+          projectsSubmissions.error
+            ? { message: projectsSubmissions.error }
+            : undefined
+        }
+        data={projectsSubmissions.data}
+        empty={EMYPTY_COURSE}
+        render={(data) => <ProjectSubmissionTableWrapper data={data} />}
       />
     </div>
   );
