@@ -426,12 +426,17 @@ export async function getStudentAchievements(
 
 // ─── Auto-award on trigger events ────────────────────────────────────────────
 
-type AchievementTrigger = "register" | "first_project" | "first_course";
+type AchievementTrigger =
+  | "register"
+  | "first_project"
+  | "first_course"
+  | "second_course";
 
 const TRIGGER_CRITERIA: Record<AchievementTrigger, { title: string }> = {
   register: { title: "Welcome Aboard" },
-  first_project: { title: "Created Your First Project" },
-  first_course: { title: "Buy One Course" },
+  first_project: { title: "Projects Starter" },
+  first_course: { title: "One Course Buyer" },
+  second_course: { title: "Two Courses Buyer" },
 };
 
 export async function checkAndAwardAchievements(

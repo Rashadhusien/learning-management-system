@@ -45,7 +45,9 @@ export default function CourseCard({ course }: { course: Course }) {
           <Badge variant="secondary">{level}</Badge>
         </CardAction>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription className="line-clamp-3 ">
+          {description}
+        </CardDescription>
       </CardHeader>
       <CardFooter>
         <Button className="w-full" asChild size={"lg"}>

@@ -4,9 +4,13 @@ import { User } from "@/types/action";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 
-const ProfileHeader = ({ userProfile }: { userProfile: User | null }) => {
-  console.log(userProfile);
-
+const ProfileHeader = ({
+  userProfile,
+  enableEdit = false,
+}: {
+  userProfile: User | null;
+  enableEdit?: boolean;
+}) => {
   if (!userProfile) {
     return (
       <header>
@@ -74,11 +78,14 @@ const ProfileHeader = ({ userProfile }: { userProfile: User | null }) => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button size="sm" className="w-full sm:w-auto">
-              Edit Profile
-            </Button>
-          </div>
+
+          {enableEdit && (
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button size="sm" className="w-full sm:w-auto">
+                Edit Profile
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </header>

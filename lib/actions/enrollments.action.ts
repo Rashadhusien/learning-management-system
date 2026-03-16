@@ -9,6 +9,7 @@ import { ActionResponse } from "@/types/action.d";
 import { auth } from "@/auth";
 import { eq, and, or, ilike, desc, count } from "drizzle-orm";
 import { projectSubmissions } from "../schema";
+import { checkAndAwardAchievements } from "./achievements.action";
 
 // ─── Enroll in Course ───────────────────────────────────────────────────────────
 
@@ -84,6 +85,9 @@ export async function enrollInCourse(
       studentId: session.user.id,
       courseId: courseId,
     });
+
+    // Find the "Buy One Course" achievement and award it
+    await checkAndAwardAchievements(session.user.id, "first_course");
 
     // Revalidate cache
     revalidatePath("/courses");

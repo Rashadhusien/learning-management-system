@@ -4,7 +4,13 @@ import { PaginatedResponse, User, ActionResponse } from "@/types/action";
 import action from "../handlers/action";
 import { PaginatedSearchParamsSchema } from "../validations";
 import { and, asc, desc, eq, ilike, or, getTableColumns } from "drizzle-orm";
-import { users } from "../schema";
+import {
+  users,
+  courses,
+  projects,
+  projectSubmissions,
+  enrollments,
+} from "../schema";
 import { db } from "../db";
 import { revalidatePath } from "next/cache";
 import { ROUTES } from "@/constants/routes";
@@ -193,6 +199,105 @@ export async function toggleStudentActive(
     return {
       success: false,
       error: "Failed to toggle student active",
+    };
+  }
+}
+
+export async function getStudentById(studentId: string) {
+  try {
+    const student = await db
+      .select({
+        // User fields
+        ...getTableColumns(users),
+      })
+      .from(users)
+      .where(eq(users.id, studentId))
+      .limit(1);
+
+    if (student.length === 0) {
+      return {
+        success: false,
+        error: "Student not found",
+      };
+    }
+
+    // Get student's courses
+    const studentCourses = await db
+      .select({
+        id: courses.id,
+        title: courses.title,
+        description: courses.description,
+        bannerUrl: courses.bannerUrl,
+        price: courses.price,
+        level: courses.level,
+        duration: courses.duration,
+
+        enrolledAt: enrollments.enrolledAt,
+      })
+      .from(enrollments)
+      .innerJoin(courses, eq(enrollments.courseId, courses.id))
+      .where(eq(enrollments.studentId, studentId));
+
+    // Get student's project submissions with project details
+    const studentProjects = await db
+      .select({
+        submission: {
+          id: projectSubmissions.id,
+          repoLink: projectSubmissions.repoLink,
+          demoLink: projectSubmissions.demoLink,
+          status: projectSubmissions.status,
+          pointsEarned: projectSubmissions.pointsEarned,
+          submittedAt: projectSubmissions.submittedAt,
+        },
+        project: {
+          id: projects.id,
+          title: projects.title,
+          description: projects.description,
+          imageCldPubId: projects.imageCldPubId,
+          points: projects.points,
+        },
+      })
+      .from(projectSubmissions)
+      .innerJoin(projects, eq(projectSubmissions.projectId, projects.id))
+      .where(eq(projectSubmissions.studentId, studentId))
+      .orderBy(desc(projectSubmissions.submittedAt));
+
+    // Calculate statistics
+    //TODO:add this stats to profile
+    // const totalSubmissions = studentProjects.length;
+    // const approvedSubmissions = studentProjects.filter(
+    //   (p) => p.submission.status === "approved",
+    // ).length;
+    // const pendingSubmissions = studentProjects.filter(
+    //   (p) => p.submission.status === "pending",
+    // ).length;
+    // const rejectedSubmissions = studentProjects.filter(
+    //   (p) => p.submission.status === "rejected",
+    // ).length;
+    // const totalProjectsEarned = studentProjects
+    //   .filter((p) => p.submission.status === "approved")
+    //   .reduce((sum, p) => sum + (p.submission.pointsEarned || 0), 0);
+
+    return {
+      success: true,
+      data: {
+        ...student[0],
+        courses: studentCourses || [],
+        projects: studentProjects || [],
+        // stats: {
+        //   totalSubmissions,
+        //   approvedSubmissions,
+        //   pendingSubmissions,
+        //   rejectedSubmissions,
+        //   totalProjectsEarned,
+        // },
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching student:", error);
+    return {
+      success: false,
+      error: "Failed to fetch student",
     };
   }
 }

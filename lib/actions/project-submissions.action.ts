@@ -2,7 +2,7 @@
 
 import action from "../handlers/action";
 import { db } from "../db";
-import { projectSubmissions, projects, users } from "../schema";
+import { enrollments, projectSubmissions, projects, users } from "../schema";
 import { revalidatePath } from "next/cache";
 import handleError from "../handlers/error";
 import {
@@ -13,6 +13,7 @@ import {
 } from "@/types/action.d";
 import { auth } from "@/auth";
 import { eq, and, or, ilike, desc, count, sql } from "drizzle-orm";
+import { checkAndAwardAchievements } from "./achievements.action";
 
 // ─── Get Projects Submissions ─────────────────────────────────────────────────────
 
@@ -317,10 +318,10 @@ export async function updateProjectSubmissionStatus(
         .where(eq(users.id, existingSubmission.studentId));
     }
 
-    // If fisrt submistion update achivemnt
-    // TODO: Update achievement
-    // check if this is the first approved project to earn the Projects Starter points and acheivment
-
+    await checkAndAwardAchievements(
+      existingSubmission.studentId,
+      "first_project",
+    );
     // Revalidate cache
     revalidatePath("/admin/projects");
     revalidatePath("/admin/projects/submissions");
@@ -382,6 +383,26 @@ export async function submitProject(
         error: "User not Active",
       };
     }
+
+    // Check if student enrolled in the course
+    const [existingEnrollment] = await db
+      .select()
+      .from(enrollments)
+      .where(
+        and(
+          eq(enrollments.studentId, session.user.id),
+          eq(enrollments.courseId, params.courseId),
+        ),
+      )
+      .limit(1);
+
+    if (!existingEnrollment) {
+      return {
+        success: false,
+        error: "You must be enrolled in this course to submit a project",
+      };
+    }
+
     // Check if student has already submitted this project
     const existingSubmission = await db
       .select()
