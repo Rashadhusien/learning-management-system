@@ -364,7 +364,12 @@ export default async function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="relative overflow-hidden">
               <div className="absolute top-4 right-4">
-                <Badge className="bg-green-500">Beginner</Badge>
+                <Badge
+                  variant="secondary"
+                  className="bg-green-600 text-white border-green-700"
+                >
+                  Beginner
+                </Badge>
               </div>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -397,7 +402,12 @@ export default async function Home() {
 
             <Card className="relative overflow-hidden">
               <div className="absolute top-4 right-4">
-                <Badge className="bg-blue-500">Intermediate</Badge>
+                <Badge
+                  variant="secondary"
+                  className="bg-blue-700 text-white border-blue-800"
+                >
+                  Intermediate
+                </Badge>
               </div>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -431,7 +441,12 @@ export default async function Home() {
 
             <Card className="relative overflow-hidden">
               <div className="absolute top-4 right-4">
-                <Badge className="bg-purple-500">Advanced</Badge>
+                <Badge
+                  variant="secondary"
+                  className="bg-purple-700 text-white border-purple-800"
+                >
+                  Advanced
+                </Badge>
               </div>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

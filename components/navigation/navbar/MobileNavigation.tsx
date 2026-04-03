@@ -21,7 +21,12 @@ const MobileNavigation = async () => {
   return (
     <Sheet>
       <SheetTrigger asChild className="cursor-pointer">
-        <Button variant="outline" size="icon" className="lg:hidden">
+        <Button
+          variant="outline"
+          size="icon"
+          className="lg:hidden"
+          aria-label="Open navigation menu"
+        >
           <Menu className="h-[1.2rem] w-[1.2rem]  rounded-full  scale-100 rotate-0 transition-all" />
         </Button>
       </SheetTrigger>

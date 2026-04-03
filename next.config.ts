@@ -20,6 +20,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Configure compiler to target modern browsers and reduce polyfills
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
+  // Configure webpack to reduce polyfills
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+      };
+    }
+    return config;
+  },
 };
 
 export default nextConfig;
