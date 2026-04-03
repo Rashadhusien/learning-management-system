@@ -3,6 +3,9 @@ import { CldImage } from "next-cloudinary";
 import { User } from "@/types/action";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import EditProfileForm from "./forms/EditProfileForm";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const ProfileHeader = ({
   userProfile,
@@ -11,6 +14,8 @@ const ProfileHeader = ({
   userProfile: User | null;
   enableEdit?: boolean;
 }) => {
+  const pathname = usePathname();
+
   if (!userProfile) {
     return (
       <header>
@@ -20,6 +25,11 @@ const ProfileHeader = ({
       </header>
     );
   }
+  // disappear on edit page
+  const isEditPage = pathname.includes("/edit");
+  if (isEditPage) {
+    return null;
+  }
 
   const { coverCldPubId, imageCldPubId } = userProfile;
 
@@ -27,7 +37,7 @@ const ProfileHeader = ({
     <header className="relative">
       {/* Banner Section */}
       <div className="relative w-full h-48 md:h-72 overflow-hidden rounded-2xl">
-        {coverCldPubId ? (
+        {coverCldPubId && coverCldPubId.trim() !== "" ? (
           <CldImage
             src={coverCldPubId}
             alt="cover"
@@ -48,7 +58,7 @@ const ProfileHeader = ({
         <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-12 sm:-mt-16">
           {/* Profile Image */}
           <div className="relative">
-            {imageCldPubId ? (
+            {imageCldPubId && imageCldPubId.trim() !== "" ? (
               <CldImage
                 src={imageCldPubId}
                 alt="profile"
@@ -81,8 +91,8 @@ const ProfileHeader = ({
 
           {enableEdit && (
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <Button size="sm" className="w-full sm:w-auto">
-                Edit Profile
+              <Button asChild>
+                <Link href="/profile/edit">Edit Profile</Link>
               </Button>
             </div>
           )}

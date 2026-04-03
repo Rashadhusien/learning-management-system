@@ -67,6 +67,16 @@ const StudentPage = async () => {
                 </p>
               </div>
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground">
+                Phone
+              </label>
+              <div className="p-4 border border-border rounded-lg bg-muted/50">
+                <p className="text-base font-medium">
+                  {userProfile?.phone || "Not provided"}
+                </p>
+              </div>
+            </div>
 
             {/* Bio */}
             <div className="space-y-2 md:col-span-2">

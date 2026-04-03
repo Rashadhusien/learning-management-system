@@ -29,7 +29,7 @@ const ProfileProjects = async (searchParams: {
           <SubmitProjectDialog />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  mt-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-4  mt-10">
           <DataRenderer
             success={success}
             error={typeof error === "string" ? { message: error } : error}

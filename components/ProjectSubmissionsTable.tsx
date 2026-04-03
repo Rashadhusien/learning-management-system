@@ -156,26 +156,10 @@ export default function ProjectSubmissionsTable({
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-green-500" />
-                    <div className="text-center">
-                      <p className="text-sm font-semibold">
-                        {submission.submission.pointsEarned || 0}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Points Earned
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Status and Actions */}
                 <div className="flex items-center gap-2">
-                  <Badge
-                    className={getStatusColor(submission.submission.status)}
-                  >
-                    {submission.submission.status}
-                  </Badge>
                   <div className="flex gap-2">
                     {submission.submission.repoLink && (
                       <Button variant="outline" size="sm" asChild>

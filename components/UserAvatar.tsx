@@ -39,6 +39,7 @@ const UserAvatar = ({
             className="object-cover"
             fill
             quality={70}
+            sizes="40px"
           />
         ) : (
           <AvatarFallback

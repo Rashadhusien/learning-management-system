@@ -8,6 +8,7 @@ import Footer from "@/components/layout/footer";
 import Script from "next/script";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { SessionProvider } from "@/components/providers/session-provider";
 
 // const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -51,10 +52,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TooltipProvider>
-            <SidebarProvider>{children}</SidebarProvider>
-            <Footer />
-          </TooltipProvider>
+          <SessionProvider>
+            <TooltipProvider>
+              <SidebarProvider>{children}</SidebarProvider>
+              <Footer />
+            </TooltipProvider>
+          </SessionProvider>
         </ThemeProvider>
         <Toaster richColors />
       </body>

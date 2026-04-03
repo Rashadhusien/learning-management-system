@@ -111,6 +111,18 @@ export const GetProfileSchema = z.object({
   userId: z.string().min(1, { message: "User Id is Required" }),
 });
 
+export const UpdateProfileSchema = z.object({
+  userId: z.string().min(1, { message: "User Id is Required" }),
+  name: z.string().min(1, { message: "Name is required." }),
+  username: z.string().min(1, { message: "Username is required." }),
+  email: z.string().email({ message: "Email is not valid." }),
+  bio: z.string().optional(),
+  phone: z.string().optional(),
+  level: z.string().optional(),
+  imageCldPubId: z.string().nullable().optional(),
+  coverCldPubId: z.string().nullable().optional(),
+});
+
 export const PaginatedSearchParamsSchema = z.object({
   page: z.number().int().positive().default(1),
   pageSize: z.number().int().positive().default(10),
@@ -126,4 +138,15 @@ export const CreateAchievementSchema = z.object({
   requiredPoints: z
     .number()
     .min(1, { message: "Points must be a positive number." }),
+});
+
+export const EditProfileSchema = z.object({
+  name: z.string().min(1, { message: "Name is required." }),
+  username: z.string().min(1, { message: "Username is required." }),
+  email: z.string().email({ message: "Email is not valid." }),
+  bio: z.string().optional(),
+  phone: z.string().optional(),
+  level: z.string().optional(),
+  imageCldPubId: z.string().optional(),
+  coverCldPubId: z.string().optional(),
 });

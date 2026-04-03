@@ -23,6 +23,7 @@ import { signOutAction } from "@/lib/actions/auth.action";
 import Link from "next/link";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
+import { getProfile } from "@/lib/actions/profile.action";
 
 export async function UserDropdown({
   isMobile = false,
@@ -31,6 +32,9 @@ export async function UserDropdown({
 }) {
   const session = await getAuthSession();
   if (!session) return null;
+  const { data: profile } = await getProfile({
+    userId: session?.user?.id || "",
+  });
   const role = session?.user?.role;
 
   return (
@@ -45,9 +49,10 @@ export async function UserDropdown({
         >
           <UserAvatar
             id={session?.user?.id || ""}
-            name={session?.user?.name || ""}
+            name={profile?.name || ""}
+            imageUrl={profile?.imageCldPubId || ""}
           />
-          <h2>{session?.user?.name}</h2>
+          <h2>{profile?.name}</h2>
           {isMobile ? <ChevronRightIcon /> : <ChevronDownIcon />}
         </Button>
       </DropdownMenuTrigger>
