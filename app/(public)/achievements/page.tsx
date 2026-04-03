@@ -24,7 +24,7 @@ const Achievements = async ({ searchParams }: SearchParams) => {
   });
 
   return (
-    <section className="container mx-auto ">
+    <section className="container mx-auto pb-20 ">
       <SectionTitle
         title="Achievements"
         description="Collect badges and trophies as you complete courses."

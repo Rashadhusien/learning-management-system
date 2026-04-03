@@ -1,8 +1,8 @@
-import { auth } from "@/auth";
 import { Card } from "@/components/ui/card";
 import { getProfile } from "@/lib/actions/profile.action";
+import { getAuthSession } from "@/lib/auth-wrapper";
 const StudentPage = async () => {
-  const session = await auth();
+  const session = await getAuthSession();
 
   const { data: userProfile } = await getProfile({ userId: session?.user.id });
 

@@ -4,6 +4,7 @@ import "./globals.css";
 // import { DM_Sans } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import Footer from "@/components/layout/footer";
 import Script from "next/script";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -52,6 +53,7 @@ export default function RootLayout({
         >
           <TooltipProvider>
             <SidebarProvider>{children}</SidebarProvider>
+            <Footer />
           </TooltipProvider>
         </ThemeProvider>
         <Toaster richColors />

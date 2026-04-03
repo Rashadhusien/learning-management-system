@@ -21,7 +21,7 @@ const Students = async ({ searchParams }: SearchParams) => {
     sort: sort || "",
   });
   return (
-    <section className="container mx-auto">
+    <section className="container mx-auto pb-20">
       <SectionTitle
         title="Academy Students"
         description="Explore profiles of students learning, building, and sharing together"

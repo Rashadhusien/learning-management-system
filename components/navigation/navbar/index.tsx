@@ -4,12 +4,12 @@ import NavLinks from "./NavLinks";
 import Link from "next/link";
 import { ROUTES } from "@/constants/routes";
 import MobileNavigation from "./MobileNavigation";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-wrapper";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const Navbar = async () => {
-  const session = await auth();
+  const session = await getAuthSession();
   return (
     <nav className="p-4 bg-background/20 backdrop-blur-md border-b border-border/40 sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between md:justify-around">
@@ -33,7 +33,8 @@ const Navbar = async () => {
           <div className="lg:hidden">
             <ModeToggle />
           </div>
-          <SidebarTrigger />
+          {/* <SidebarTrigger /> */}
+          <MobileNavigation />
         </div>
       </div>
     </nav>

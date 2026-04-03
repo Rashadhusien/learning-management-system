@@ -23,7 +23,7 @@ const Courses = async ({ searchParams }: SearchParams) => {
   });
 
   return (
-    <section className="container mx-auto my-8">
+    <section className="container mx-auto pb-20">
       <SectionTitle
         title="Explore Our Courses"
         description="Learn programming step-by-step with real-world examples and projects"

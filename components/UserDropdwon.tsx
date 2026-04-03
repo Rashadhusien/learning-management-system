@@ -9,18 +9,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   BadgeCheckIcon,
-  BellIcon,
   BookOpenIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  CreditCardIcon,
   FolderIcon,
   LayoutDashboardIcon,
   LogOutIcon,
   TrophyIcon,
 } from "lucide-react";
 import UserAvatar from "./UserAvatar";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-wrapper";
 import { signOutAction } from "@/lib/actions/auth.action";
 import Link from "next/link";
 import { ROUTES } from "@/constants/routes";
@@ -31,7 +29,7 @@ export async function UserDropdown({
 }: {
   isMobile?: boolean;
 }) {
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session) return null;
   const role = session?.user?.role;
 

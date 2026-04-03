@@ -22,7 +22,7 @@ const Projects = async ({ searchParams }: SearchParams) => {
     sort: sort || "",
   });
   return (
-    <section className="container mx-auto">
+    <section className="container mx-auto pb-20">
       <SectionTitle
         title="Academy Projects"
         description="Explore our collection of coding projects with their point values and completion stats"

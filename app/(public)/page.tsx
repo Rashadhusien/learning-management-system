@@ -1,10 +1,10 @@
-import { auth } from "@/auth";
 import Hero from "@/components/Hero";
+import { getAuthSession } from "@/lib/auth-wrapper";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const session = await auth();
+  const session = await getAuthSession();
 
   return (
     <main>

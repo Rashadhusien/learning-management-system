@@ -30,9 +30,10 @@ const NavLinks = ({
           <Link
             href={item.route}
             className={cn(
-              isActive ? " rounded-lg " : "",
               "flex items-center justify-start gap-4  p-4 ",
               !isMobileNav && isActive && "text-primary",
+              !isMobileNav && "hover:text-primary/70",
+              isMobileNav && "rounded-lg hover:bg-primary/10 ",
               isMobileNav && isActive && "bg-primary/10 rounded-xl",
               isAdmin && isActive && "bg-primary/10 rounded-xl",
             )}

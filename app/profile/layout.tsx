@@ -1,5 +1,5 @@
 import { ROUTES } from "@/constants/routes";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-wrapper";
 import { getProfile } from "@/lib/actions/profile.action";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -8,7 +8,7 @@ import ProfileHeader from "@/components/ProfileHeader";
 import { SidebarInset } from "@/components/ui/sidebar";
 
 const StudentLayout = async ({ children }: { children: React.ReactNode }) => {
-  const session = await auth();
+  const session = await getAuthSession();
   if (!session) redirect(ROUTES.LOGIN);
 
   const { data: userProfile } = await getProfile({ userId: session.user.id });

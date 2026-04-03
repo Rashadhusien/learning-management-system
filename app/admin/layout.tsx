@@ -1,5 +1,5 @@
 import React from "react";
-import { auth } from "@/auth";
+import { getAuthSession } from "@/lib/auth-wrapper";
 import { redirect, notFound } from "next/navigation";
 import { ROUTES } from "@/constants/routes";
 import { AdminSidebar } from "@/components/navigation/admin-sidebar";
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
-  const session = await auth();
+  const session = await getAuthSession();
 
   if (!session) redirect(ROUTES.LOGIN);
 
