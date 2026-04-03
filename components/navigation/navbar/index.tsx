@@ -6,12 +6,11 @@ import { ROUTES } from "@/constants/routes";
 import MobileNavigation from "./MobileNavigation";
 import { getAuthSession } from "@/lib/auth-wrapper";
 import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const Navbar = async () => {
   const session = await getAuthSession();
   return (
-    <nav className="p-4 bg-background/20 backdrop-blur-md border-b border-border/40 sticky top-0 z-50">
+    <nav className="p-2 bg-background/20 backdrop-blur-md border-b border-border/40 sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between md:justify-around">
         <h1 className="text-3xl font-bold font-space-grotesk  text-primary">
           <Link href={ROUTES.HOME}>Cody</Link>

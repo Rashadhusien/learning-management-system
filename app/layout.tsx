@@ -52,11 +52,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SessionProvider>
-            <TooltipProvider>
-              <SidebarProvider>{children}</SidebarProvider>
-            </TooltipProvider>
-          </SessionProvider>
+          <SessionProvider>{children}</SessionProvider>
         </ThemeProvider>
         <Toaster richColors />
       </body>

@@ -9,7 +9,7 @@ const SectionTitle = ({
 }) => {
   return (
     <div className="text-center space-y-4 my-12">
-      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
+      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-space-grotesk tracking-tight text-foreground">
         {title}
       </h1>
       <p className="text-xl text-muted-foreground max-w-[800px] mx-auto">

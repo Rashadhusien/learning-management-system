@@ -103,7 +103,7 @@ function Podium({ topStudents }: { topStudents: LeaderboardStudent[] }) {
                         alt={student.name}
                         width={80}
                         height={80}
-                        className="rounded-full border-4 border-white shadow-xl"
+                        className="rounded-full border-4 border-white shadow-xl w-20 h-20 object-cover"
                       />
                       <div className="absolute -bottom-1 -right-1 text-lg">
                         {position.medal}

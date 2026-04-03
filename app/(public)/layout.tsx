@@ -7,14 +7,11 @@ import React from "react";
 const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
   return (
     <>
-      <AppSidebar />
-      <SidebarInset>
-        <div className="relative">
-          <Navbar />
-          {children}
-          <Footer />
-        </div>
-      </SidebarInset>
+      <div className="relative">
+        <Navbar />
+        {children}
+        <Footer />
+      </div>
     </>
   );
 };

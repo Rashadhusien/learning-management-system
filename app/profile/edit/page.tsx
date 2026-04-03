@@ -39,8 +39,6 @@ const EditProfilePage = () => {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      if (status === "loading") return; // Don't do anything while loading
-
       if (status === "authenticated" && session?.user?.id) {
         try {
           const response = await getProfile({ userId: session.user.id });
