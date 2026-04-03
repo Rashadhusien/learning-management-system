@@ -20,7 +20,7 @@ export async function getProfile(params: {
   });
 
   if (validationResult instanceof Error) {
-    return { success: false, error: "Validation failed" };
+    return { success: false, error: { message: "Validation failed" } };
   }
 
   try {
@@ -38,10 +38,10 @@ export async function getProfile(params: {
       return { success: true, data: userData };
     }
 
-    return { success: false, error: "User not found" };
+    return { success: false, error: { message: "User not found" } };
   } catch (error) {
     console.error("Error fetching profile:", error);
-    return { success: false, error: "Failed to fetch profile" };
+    return { success: false, error: { message: "Failed to fetch profile" } };
   }
 }
 
@@ -63,11 +63,26 @@ export async function updateProfile(params: {
   });
 
   if (validationResult instanceof Error) {
-    return { success: false, error: "Validation failed" };
+    return { success: false, error: { message: "Validation failed" } };
   }
 
   try {
     const { userId, ...updateData } = params;
+
+    // Check if user exists and is active
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (!existingUser) {
+      return { success: false, error: { message: "User not found" } };
+    }
+
+    if (!existingUser.active) {
+      return { success: false, error: { message: "Account is not active" } };
+    }
 
     const updatedUser = await db
       .update(users)
@@ -88,9 +103,9 @@ export async function updateProfile(params: {
       return { success: true, data: userData };
     }
 
-    return { success: false, error: "Failed to update profile" };
+    return { success: false, error: { message: "Failed to update profile" } };
   } catch (error) {
     console.error("Error updating profile:", error);
-    return { success: false, error: "Failed to update profile" };
+    return { success: false, error: { message: "Failed to update profile" } };
   }
 }

@@ -1,10 +1,8 @@
 "use server";
 
-import action from "../handlers/action";
 import { db } from "../db";
 import { enrollments, courses, users } from "../schema";
 import { revalidatePath } from "next/cache";
-import handleError from "../handlers/error";
 import { ActionResponse } from "@/types/action.d";
 import { auth } from "@/auth";
 import { eq, and, or, ilike, desc, count } from "drizzle-orm";
@@ -99,7 +97,10 @@ export async function enrollInCourse(
     };
   } catch (error) {
     console.error("Error enrolling in course:", error);
-    return handleError(error) as ErrorResponse;
+    return {
+      success: false,
+      error: "Failed to enroll in course",
+    };
   }
 }
 
@@ -207,7 +208,7 @@ export async function getCourseEnrollments(
           name: users.name,
           username: users.username,
           email: users.email,
-          image: users.imageCldPubId,
+          image: users.imageCldPubId || undefined,
           totalPoints: users.totalPoints,
         },
         enrolledAt: enrollments.enrolledAt,
@@ -245,7 +246,7 @@ export async function getCourseEnrollments(
     };
   } catch (error) {
     console.error("Error getting course enrollments:", error);
-    return handleError(error) as ErrorResponse;
+    return { success: false, error: "Failed to get course enrollments" };
   }
 }
 
@@ -276,6 +277,6 @@ export async function getStudentEnrollments(): Promise<
     };
   } catch (error) {
     console.error("Error getting student enrollments:", error);
-    return handleError(error) as ErrorResponse;
+    return { success: false, error: "Failed to get student enrollments" };
   }
 }

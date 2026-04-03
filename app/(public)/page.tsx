@@ -323,30 +323,6 @@ export default async function Home() {
                 courses: 6,
                 color: "bg-pink-500",
               },
-              {
-                name: "Cloud Computing",
-                icon: "☁️",
-                courses: 7,
-                color: "bg-cyan-500",
-              },
-              {
-                name: "DevOps",
-                icon: "⚙️",
-                courses: 5,
-                color: "bg-orange-500",
-              },
-              {
-                name: "Machine Learning",
-                icon: "🤖",
-                courses: 9,
-                color: "bg-red-500",
-              },
-              {
-                name: "Cybersecurity",
-                icon: "🔒",
-                courses: 4,
-                color: "bg-indigo-500",
-              },
             ].map((category, index) => (
               <Card
                 key={index}

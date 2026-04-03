@@ -7,7 +7,7 @@ import Navbar from "@/components/navigation/navbar";
 import ProfileHeader from "@/components/ProfileHeader";
 import { SidebarInset } from "@/components/ui/sidebar";
 import Footer from "@/components/layout/footer";
-
+import { Analytics } from "@vercel/analytics/next";
 const StudentLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await getAuthSession();
   if (!session) redirect(ROUTES.LOGIN);
@@ -24,6 +24,7 @@ const StudentLayout = async ({ children }: { children: React.ReactNode }) => {
         </main>
         <Footer />
       </div>
+      <Analytics />
     </SidebarInset>
   );
 };
