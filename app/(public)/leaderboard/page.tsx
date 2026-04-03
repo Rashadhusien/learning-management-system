@@ -86,7 +86,7 @@ function Podium({ topStudents }: { topStudents: LeaderboardStudent[] }) {
             >
               {/* Student Card */}
               <Card
-                className={`${position.bgColor} max-h-56 ${rank === 1 ? "mb-10" : rank === 2 ? "mb-5" : "mb-4"}  w-56 flex flex-col justify-center items-center text-center border-3 ${position.borderColor} shadow-2xl ${position.shadowColor} transform transition-all duration-300 hover:shadow-3xl relative overflow-hidden`}
+                className={`bg-muted  max-h-56 ${rank === 1 ? "mb-10" : rank === 2 ? "mb-5" : "mb-4"}  w-56 flex flex-col justify-center items-center text-center border ${position.borderColor} shadow-2xl ${position.shadowColor} transform transition-all duration-300 hover:shadow-3xl relative overflow-hidden`}
               >
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-10">

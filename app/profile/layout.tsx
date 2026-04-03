@@ -6,6 +6,7 @@ import React from "react";
 import Navbar from "@/components/navigation/navbar";
 import ProfileHeader from "@/components/ProfileHeader";
 import { SidebarInset } from "@/components/ui/sidebar";
+import Footer from "@/components/layout/footer";
 
 const StudentLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await getAuthSession();
@@ -21,6 +22,7 @@ const StudentLayout = async ({ children }: { children: React.ReactNode }) => {
           <ProfileHeader userProfile={userProfile!} enableEdit />
           {children}
         </main>
+        <Footer />
       </div>
     </SidebarInset>
   );

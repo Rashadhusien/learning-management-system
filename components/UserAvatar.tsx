@@ -16,7 +16,6 @@ interface Props {
 }
 
 const UserAvatar = ({
-  id,
   name,
   imageUrl,
   className = "h-9 w-9",
@@ -39,7 +38,7 @@ const UserAvatar = ({
             className="object-cover"
             fill
             quality={70}
-            sizes="40px"
+            sizes="80px"
           />
         ) : (
           <AvatarFallback

@@ -1,5 +1,5 @@
 import { UserDropdown } from "@/components/UserDropdwon";
-import { ModeToggle } from "./mode-toggle";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import NavLinks from "./NavLinks";
 import Link from "next/link";
 import { ROUTES } from "@/constants/routes";
@@ -27,11 +27,11 @@ const Navbar = async () => {
               <Button>log in</Button>
             </Link>
           )}
-          <ModeToggle />
+          <ThemeSwitcher />
         </div>
         <div className="flex items-center gap-2 lg:hidden">
           <div className="lg:hidden">
-            <ModeToggle />
+            <ThemeSwitcher />
           </div>
           {/* <SidebarTrigger /> */}
           <MobileNavigation />

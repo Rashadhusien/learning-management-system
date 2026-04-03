@@ -57,6 +57,13 @@
       "when": 1772818012543,
       "tag": "0007_tiresome_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1775207867966,
+      "tag": "0008_damp_spiral",
+      "breakpoints": true
     }
   ]
 }

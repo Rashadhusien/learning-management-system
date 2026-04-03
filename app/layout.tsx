@@ -55,7 +55,6 @@ export default function RootLayout({
           <SessionProvider>
             <TooltipProvider>
               <SidebarProvider>{children}</SidebarProvider>
-              <Footer />
             </TooltipProvider>
           </SessionProvider>
         </ThemeProvider>

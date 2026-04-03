@@ -49,12 +49,14 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">
-                  LMS
+              <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-xl font-space-grotesk">
+                  C
                 </span>
               </div>
-              <span className="font-bold text-xl">Learning Platform</span>
+              <span className=" font-bold text-2xl font-space-grotesk">
+                Cody
+              </span>{" "}
             </div>
             <p className="text-muted-foreground text-sm max-w-xs">
               Empowering learners worldwide with quality courses, hands-on

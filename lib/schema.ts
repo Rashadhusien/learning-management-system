@@ -44,7 +44,7 @@ export const users = pgTable(
     // Academy fields
     bio: text("bio"),
     phone: text("phone"),
-    level: text("level").default("Beginner"),
+    level: text("level").default("Beginner").notNull(),
     totalPoints: integer("total_points").default(0).notNull(),
     isDeleted: boolean("is_deleted").default(false).notNull(),
 

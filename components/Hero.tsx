@@ -1,90 +1,97 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-
-import { ArrowRight, Trophy, Code, BookOpen } from "lucide-react";
+import {
+  ArrowRight,
+  Trophy,
+  Code,
+  Sparkles,
+  Users,
+  Target,
+} from "lucide-react";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 const Hero = () => {
   return (
-    <section className="relative text-center overflow-hidden bg-background py-24 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="">
+    <section className="relative text-center overflow-hidden bg-background pt-10 px-4 sm:px-6 lg:px-8">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute top-20 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-2xl translate-x-1/3"></div>
+        <div className="absolute bottom-0 left-20 w-80 h-80 bg-purple-500/10 rounded-full blur-2xl translate-y-1/3"></div>
+      </div>
+
+      <div className="relative mx-auto max-w-7xl z-10">
+        <div className="flex justify-center items-center text-center">
           {/* Left Content */}
-          <div className="space-y-10">
-            <div className="space-y-4">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
-                Learn, Build, Achieve your potential
+          <div className="space-y-8 text-center ">
+            <div className="space-y-6">
+              <Badge
+                variant="outline"
+                className="w-fit mb-4 bg-primary/10 text-primary border-primary/20"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                New Learning Experience
+              </Badge>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-foreground leading-tight mb-4">
+                Learn, Build,{" "}
+                <span className="relative">
+                  <span className="text-primary font-bold relative z-10">
+                    Achieve
+                  </span>
+                  <span className="absolute inset-0 bg-primary/20 blur-md -z-10"></span>
+                </span>
               </h1>
-              <p className="text-xl text-muted-foreground max-w-[600px] mx-auto">
-                Welcome to Elzero platform built exclusively for enrolled
-                students to access their courses, track progress easily, and
-                showcase practical work through real portfolio projects.
+
+              <p className="text-xl text-muted-foreground max-w-[600px] text-center mx-auto leading-relaxed mb-8">
+                Welcome to Cody platform built exclusively for enrolled students
+                to access their courses, track progress easily, and showcase
+                practical work through real portfolio projects.
               </p>
-            </div>
 
-            <div className="flex flex-col sm:flex-row justify-center gap-4 ">
-              <Link href="/courses">
-                <Button size="lg" className="group">
-                  Explore Courses
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button variant="outline" size="lg">
-                  Get Started
-                </Button>
-              </Link>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <Card className="text-center">
-                <CardContent className="p-4">
-                  <div className="flex flex-col items-center space-y-2">
-                    <Trophy className="h-8 w-8 text-primary" />
-                    <div className="text-2xl font-bold">10070</div>
-                    <div className="text-sm text-muted-foreground">
-                      Points Earned
-                    </div>
+              {/* Feature Pills */}
+              <div className="flex flex-wrap gap-3 mb-8 justify-center">
+                {[
+                  { icon: Target, text: "Skill-Based Learning" },
+                  { icon: Users, text: "Community Driven" },
+                  { icon: Trophy, text: "Achievement System" },
+                  { icon: Code, text: "Real Projects" },
+                ].map((feature, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full border border-border/50"
+                  >
+                    <feature.icon className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium text-foreground">
+                      {feature.text}
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
+                ))}
+              </div>
 
-              <Card className="text-center">
-                <CardContent className="p-4">
-                  <div className="flex flex-col items-center space-y-2">
-                    <Code className="h-8 w-8 text-primary" />
-                    <div className="text-2xl font-bold">26</div>
-                    <div className="text-sm text-muted-foreground">
-                      Projects Completed
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="text-center">
-                <CardContent className="p-4">
-                  <div className="flex flex-col items-center space-y-2">
-                    <Trophy className="h-8 w-8 text-primary" />
-                    <div className="text-2xl font-bold">14</div>
-                    <div className="text-sm text-muted-foreground">
-                      Students
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="text-center">
-                <CardContent className="p-4">
-                  <div className="flex flex-col items-center space-y-2">
-                    <BookOpen className="h-8 w-8 text-primary" />
-                    <div className="text-2xl font-bold">2</div>
-                    <div className="text-sm text-muted-foreground">Courses</div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/courses">
+                  <Button size="lg" className="group relative overflow-hidden">
+                    <span className="relative z-10 flex items-center">
+                      Explore Courses
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </span>
+                    <div className="absolute inset-0 bg-primary/20 blur-md -z-10"></div>
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="group hover:border-primary hover:text-primary transition-all duration-300"
+                  >
+                    Get Started
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
