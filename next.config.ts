@@ -24,15 +24,9 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
-  // Configure webpack to reduce polyfills
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-      };
-    }
-    return config;
+  // Turbopack configuration for Next.js 16
+  turbopack: {
+    // Add Turbopack-specific configurations here if needed
   },
 };
 
