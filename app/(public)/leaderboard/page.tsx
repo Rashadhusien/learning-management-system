@@ -72,7 +72,7 @@ function Podium({ topStudents }: { topStudents: LeaderboardStudent[] }) {
   return (
     <div className="relative mb-5">
       {/* Podium Platform */}
-      <div className="flex justify-center items-end gap-8 mb-8 relative mt-8">
+      <div className="flex flex-col items-center md:flex-row justify-center md:items-end gap-8 mb-8 relative mt-8">
         {podiumOrder.map((rank) => {
           const student = topStudents.find((s) => s.rank === rank);
           const position = getPodiumPosition(rank);

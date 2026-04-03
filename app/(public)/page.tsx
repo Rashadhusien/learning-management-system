@@ -186,7 +186,7 @@ export default async function Home() {
                 <h3 className="text-2xl font-bold">Featured Projects</h3>
               </div>
 
-              <div className="grid max-lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
                 {projects &&
                   projects?.map((project, index) => (
                     <ProjectCard project={project} key={index} />
@@ -207,7 +207,7 @@ export default async function Home() {
                 <h3 className="text-2xl font-bold">New Courses</h3>
               </div>
 
-              <div className="grid max-lg:grid-cols-2  gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
                 {courses?.map((course) => (
                   <CourseCard course={course} key={course.id} />
                 ))}
@@ -577,7 +577,7 @@ export default async function Home() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 {session ? (
                   <>
-                    <Button size="lg" className="text-lg px-8" asChild>
+                    <Button size="lg" className=" px-8" asChild>
                       <Link href={ROUTES.COURSES}>
                         Browse Courses <ArrowRight className="ml-2 h-5 w-5" />
                       </Link>
@@ -585,7 +585,7 @@ export default async function Home() {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="text-lg px-8"
+                      className=" px-8"
                       asChild
                     >
                       <Link href={ROUTES.PROFILE}>Go to Profile</Link>

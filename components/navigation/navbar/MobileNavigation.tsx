@@ -48,7 +48,7 @@ const MobileNavigation = async () => {
                 <NavLinks isMobileNav />
               </section>
             </SheetClose>
-            <div className="flex flex-col gap-3 mt-5">
+            <div className="flex flex-col gap-3 mt-5 mb-20">
               {userId ? (
                 <UserDropdown isMobile />
               ) : (
