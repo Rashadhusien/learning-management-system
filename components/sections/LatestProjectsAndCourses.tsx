@@ -1,9 +1,5 @@
 "use client";
 
-import { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ROUTES } from "@/constants/routes";
 import { Trophy, BookOpen, ArrowRight, Sparkles } from "lucide-react";
 import CourseCard from "../cards/CourseCard";
@@ -15,8 +11,6 @@ import Link from "next/link";
 import SectionTitle from "../SectionTitle";
 import SectionTitleMarker from "../SectionTitleMarker";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger);
-
 const LatestProjectsAndCourses = ({
   projects,
   courses,
@@ -24,41 +18,8 @@ const LatestProjectsAndCourses = ({
   projects: ProjectWithCourse[];
   courses: CourseWithCategory[];
 }) => {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 85%",
-          once: true,
-        },
-        defaults: { ease: "power3.out", clearProps: "all" },
-      });
-
-      // SectionTitle handles its own animations, so we only need to animate the content
-      tl.from(
-        ".proj-card",
-        { opacity: 0, x: -24, duration: 0.45, stagger: 0.1 },
-        "-=0.25",
-      )
-        .from(
-          ".course-card",
-          { opacity: 0, x: 24, duration: 0.45, stagger: 0.1 },
-          "-=0.55",
-        )
-        .from(
-          ".view-all-btn",
-          { opacity: 0, y: 10, duration: 0.4, stagger: 0.1 },
-          "-=0.2",
-        );
-    },
-    { scope: sectionRef },
-  );
-
   return (
-    <section ref={sectionRef} className="py-20 bg-muted/30 overflow-hidden">
+    <section className="py-20 bg-muted/30 overflow-hidden">
       <div className="container mx-auto px-4">
         <SectionTitle
           badgeIcon={<Sparkles className="h-4 w-4" />}

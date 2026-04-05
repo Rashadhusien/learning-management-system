@@ -136,7 +136,7 @@ const CTA = ({ session }: { session: Session | null }) => {
             </Badge>
 
             {/* Title */}
-            <h2 className="cta-title text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight max-w-3xl">
+            <h2 className="cta-title text-3xl sm:text-5xl font-bold sm:font-extrabold tracking-tight leading-tight max-w-3xl">
               Ready to start your{" "}
               <span className=" font-space-grotesk text-muted-foreground ">
                 learning journey?

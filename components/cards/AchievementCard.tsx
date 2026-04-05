@@ -1,20 +1,5 @@
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
+import { Award } from "lucide-react";
 import { Achievement } from "@/types/action";
-
-import { Badge } from "../ui/badge";
-
-import { Separator } from "../ui/separator";
-
-import { Field, FieldLabel } from "@/components/ui/field";
-
-import { Progress } from "@/components/ui/progress";
 import CloudinaryImage from "../Image";
 
 export default function AchievementCard({
@@ -24,66 +9,62 @@ export default function AchievementCard({
 }) {
   const {
     title,
-
     description,
     progressPercent,
     totalStudents,
     earnedCount,
-
     imageCldPubId,
-
     requiredPoints,
   } = achievement;
 
   return (
-    <Card className="group relative mx-auto w-full max-w-sm transition-transform duration-300 hover:shadow-lg hover:scale-105">
-      <CardHeader className="text-center pb-3">
-        <div className="flex justify-center mb-4">
+    <div className="flex flex-col bg-background border border-border/50 rounded-xl overflow-hidden hover:border-border/80 transition-colors duration-200">
+      {/* Body — centered */}
+      <div className="flex flex-col items-center text-center gap-2 p-5 flex-1">
+        <div className="w-12 h-12 rounded-xl border border-border/50 bg-muted/40 flex items-center justify-center shrink-0">
           {imageCldPubId ? (
             <CloudinaryImage
               src={imageCldPubId}
               alt={title}
-              className="h-20 w-20 rounded-lg border-4 border-background shadow-lg object-cover"
-              width={80}
-              height={80}
+              width={32}
+              height={32}
+              className="object-cover"
             />
           ) : (
-            <div className="h-20 w-20 rounded-lg border-4 border-background shadow-lg bg-linear-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
-              <span className="text-3xl">🏆</span>
-            </div>
+            <Award
+              className="w-5 h-5 text-muted-foreground"
+              strokeWidth={1.5}
+            />
           )}
         </div>
 
-        <div className="space-y-2">
-          <CardTitle className="text-xl font-semibold">{title}</CardTitle>
-
-          <CardDescription className="text-sm text-muted-foreground line-clamp-2">
-            {description || "Complete this achievement to earn points!"}
-          </CardDescription>
+        <div>
+          <p className="text-sm font-medium text-foreground">{title}</p>
+          <p className="text-[11px] text-muted-foreground leading-relaxed mt-1 line-clamp-2">
+            {description ?? "Complete this achievement to earn points!"}
+          </p>
         </div>
 
-        <div className="flex justify-center pt-2">
-          <Badge variant="secondary" className="text-md w-full h-9">
-            Earn {requiredPoints} points
-          </Badge>
+        <span className="inline-flex items-center text-[11px] font-medium px-2.5 py-1 rounded-full border border-border/50 bg-muted/40 text-muted-foreground">
+          Earn {requiredPoints} points
+        </span>
+      </div>
+
+      {/* Progress footer */}
+      <div className="px-4 pb-4 pt-3 border-t border-border/50 space-y-2">
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>
+            {totalStudents ?? 0} / {earnedCount ?? 0} students
+          </span>
+          <span>{progressPercent ?? 0}%</span>
         </div>
-      </CardHeader>
-
-      <Separator />
-
-      <CardFooter className="pt-0">
-        <Field className="w-full max-w-sm">
-          <FieldLabel htmlFor="progress-upload">
-            <span>
-              Student Earned {totalStudents || 0} / {earnedCount || 0}
-            </span>
-
-            <span className="ml-auto">{progressPercent}%</span>
-          </FieldLabel>
-
-          <Progress value={progressPercent || 0} id="progress-upload" />
-        </Field>
-      </CardFooter>
-    </Card>
+        <div className="h-1 w-full bg-border/40 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary/60 rounded-full transition-all duration-500"
+            style={{ width: `${progressPercent ?? 0}%` }}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
