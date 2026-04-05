@@ -48,6 +48,8 @@ const CourseDetailPage = async ({ params }: CourseDetailPageProps) => {
           src={course.bannerUrl}
           alt={course.title}
           fill
+          sizes="100vw"
+          quality={80}
           className="object-cover"
           priority
         />

@@ -15,7 +15,9 @@ export default function CourseCard({ course }: { course: Course }) {
           src={bannerUrl}
           alt={title}
           fill
-          className="object-cover transition-transform duration-350 group-hover:scale-[1.04]"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          quality={75}
+          className="object-cover transition-transform duration-300 will-change-transform group-hover:scale-[1.04]"
         />
       </div>
 

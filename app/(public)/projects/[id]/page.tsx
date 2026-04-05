@@ -34,11 +34,13 @@ const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
           src={project.imageCldPubId}
           alt={project.title}
           fill
+          sizes="100vw"
+          quality={80}
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-primary/20 to-transparent" />
 
         {/* Back */}
         <div className="absolute top-5 left-4 sm:left-8">

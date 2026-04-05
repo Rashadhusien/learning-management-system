@@ -1,8 +1,9 @@
 "use client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 import { formUrlQuery, removeKeysFromUrlQuery } from "@/lib/url";
+import { debounce } from "@/lib/performance";
 import { InputGroup } from "../ui/input-group";
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
@@ -42,13 +43,15 @@ const LocalSearch = ({
   // Memoize searchParams string to prevent unnecessary re-renders
   const searchParamsString = searchParams.toString();
 
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (searchQuery) {
+  // Debounced search handler to reduce rapid navigation updates
+  const debouncedSearch = useCallback(
+    debounce((...args: unknown[]) => {
+      const query = args[0] as string;
+      if (query) {
         const newUrl = formUrlQuery({
           params: searchParamsString,
           key: "query",
-          value: searchQuery,
+          value: query,
         });
         routerRef.current.push(newUrl, { scroll: false });
       } else {
@@ -60,9 +63,13 @@ const LocalSearch = ({
           routerRef.current.push(newUrl, { scroll: false });
         }
       }
-      return () => clearTimeout(delayDebounce);
-    }, 300);
-  }, [searchQuery, searchParamsString]); // Depend on memoized searchParamsString
+    }, 300),
+    [searchParamsString],
+  );
+
+  useEffect(() => {
+    debouncedSearch(searchQuery);
+  }, [searchQuery, debouncedSearch]);
 
   return (
     <InputGroup

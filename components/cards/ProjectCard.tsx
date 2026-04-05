@@ -16,7 +16,9 @@ export default function ProjectCard({ project }: { project: Project }) {
           alt={title}
           width={300}
           height={112}
-          className="object-contain h-full w-full transition-transform duration-350 group-hover:scale-[1.04]"
+          quality={75}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-contain h-full w-full transition-transform duration-300 will-change-transform group-hover:scale-[1.04]"
         />
       </div>
 

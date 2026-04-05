@@ -178,16 +178,16 @@
 }
 
 @utility prose {
-  @apply !max-w-full;
+  @apply max-w-full!;
 }
 
 @utility markdown {
-  @apply !max-w-full;
+  @apply max-w-full!;
   @apply my-2;
 }
 
 @utility markdown-editor {
-  @apply !max-w-full;
+  @apply max-w-full!;
   @apply m-0;
 }
 
