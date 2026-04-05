@@ -64,7 +64,7 @@ const LatestProjectsAndCourses = ({
   );
 
   return (
-    <section ref={sectionRef} className="py-20 bg-muted/30">
+    <section ref={sectionRef} className="py-20 bg-muted/30 overflow-hidden">
       <div className="container mx-auto px-4">
         <SectionTitle
           badgeIcon={<Sparkles className="h-4 w-4" />}
