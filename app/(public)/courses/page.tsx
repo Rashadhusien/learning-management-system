@@ -1,5 +1,5 @@
 import DataRenderer from "@/components/DataRenderer";
-import SectionTitle from "@/components/SectionTitle";
+import PageTitle from "@/components/PageTitle";
 import CourseCard from "@/components/cards/CourseCard";
 import CommonFilter from "@/components/filters/CommonFilter";
 import LocalSearch from "@/components/search/LocalSearch";
@@ -24,7 +24,7 @@ const Courses = async ({ searchParams }: SearchParams) => {
 
   return (
     <section className="container mx-auto pb-20">
-      <SectionTitle
+      <PageTitle
         title="Explore Our Courses"
         description="Learn programming step-by-step with real-world examples and projects"
       />

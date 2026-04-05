@@ -37,7 +37,6 @@ const UserAvatar = ({
             alt={name}
             className="object-cover"
             fill
-            quality={70}
             sizes="80px"
           />
         ) : (

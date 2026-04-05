@@ -23,7 +23,7 @@ export default function ProjectCard({ project }: { project: Project }) {
     points,
   } = project;
   return (
-    <Card className="group relative mx-auto w-full max-w-sm pt-0  transition-transform duration-300 hover:shadow-lg hover:scale-105">
+    <Card className="group relative mx-auto w-full max-w-sm pt-0  transition-transform duration-300 hover:shadow-lg ">
       <div className="relative overflow-hidden">
         <Image
           src={imageCldPubId}

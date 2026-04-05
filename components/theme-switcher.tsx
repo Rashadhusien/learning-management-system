@@ -8,165 +8,103 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEffect, useReducer } from "react";
+import { useEffect, useState } from "react";
 
 type Theme = "light" | "dark" | "blue" | "red";
 
-interface ThemeState {
-  theme: Theme;
-  isClient: boolean;
+const THEMES: Theme[] = ["light", "dark", "blue", "red"];
+
+// ✅ Single atomic apply — no rAF, no setTimeout, no double-hop
+function applyTheme(theme: Theme) {
+  const root = document.documentElement;
+  // Remove only the current theme class, not all 4 every time
+  THEMES.forEach((t) => root.classList.remove(t));
+  root.classList.add(theme);
+  root.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
 }
 
-type ThemeAction =
-  | { type: "INITIALIZE"; theme: Theme }
-  | { type: "CHANGE"; theme: Theme };
-
-function themeReducer(state: ThemeState, action: ThemeAction): ThemeState {
-  switch (action.type) {
-    case "INITIALIZE":
-      return { ...state, theme: action.theme, isClient: true };
-    case "CHANGE":
-      return { ...state, theme: action.theme };
-    default:
-      return state;
+// ✅ Read synchronously — no async, no delay
+function getStoredTheme(): Theme {
+  if (typeof window === "undefined") return "light";
+  try {
+    const stored = localStorage.getItem("theme") as Theme;
+    if (stored && THEMES.includes(stored)) return stored;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  } catch {
+    return "light";
   }
 }
 
+const themeIcons: Record<Theme, React.ReactNode> = {
+  light: <Sun className="h-4 w-4" />,
+  dark: <Moon className="h-4 w-4" />,
+  blue: (
+    <div className="h-4 w-4 rounded-full bg-blue-500" aria-label="Blue theme" />
+  ),
+  red: (
+    <div className="h-4 w-4 rounded-full bg-red-500" aria-label="Red theme" />
+  ),
+};
+
+const themeLabels: Record<Theme, string> = {
+  light: "Light",
+  dark: "Dark",
+  blue: "Blue",
+  red: "Red",
+};
+
 export function ThemeSwitcher() {
-  const [state, dispatch] = useReducer(themeReducer, {
-    theme: "light",
-    isClient: false,
-  });
+  // ✅ Initialize directly from localStorage — no flash, no reducer needed
+  const [theme, setTheme] = useState<Theme>(() => getStoredTheme());
 
-  const applyTheme = (newTheme: Theme) => {
-    if (typeof window === "undefined") return;
-
-    // Batch DOM operations to prevent forced reflows
-    requestAnimationFrame(() => {
-      const root = document.documentElement;
-
-      // Use classList.replace for better performance when possible
-      if (root.classList.length > 0) {
-        root.classList.remove("light", "dark", "blue", "red");
-      }
-
-      root.classList.add(newTheme);
-
-      // Defer localStorage access to avoid blocking
-      setTimeout(() => {
-        localStorage.setItem("theme", newTheme);
-      }, 0);
-    });
-  };
-
-  // Initialize on mount
+  // ✅ Single effect, only for system theme change listener
   useEffect(() => {
-    // Defer theme detection to prevent blocking initial render
-    const initializeTheme = () => {
-      const storedTheme = localStorage.getItem("theme") as Theme;
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      const initialTheme = storedTheme || systemTheme;
-
-      dispatch({ type: "INITIALIZE", theme: initialTheme });
-      applyTheme(initialTheme);
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e: MediaQueryListEvent) => {
+      // Only follow system if user hasn't manually set a theme
+      if (!localStorage.getItem("theme")) {
+        const next: Theme = e.matches ? "dark" : "light";
+        setTheme(next);
+        applyTheme(next);
+      }
     };
-
-    // Use requestIdleCallback if available, otherwise setTimeout
-    if (window.requestIdleCallback) {
-      window.requestIdleCallback(initializeTheme);
-    } else {
-      setTimeout(initializeTheme, 0);
-    }
+    media.addEventListener("change", handler);
+    return () => media.removeEventListener("change", handler);
   }, []);
 
-  // Apply theme when theme changes
-  useEffect(() => {
-    if (state.isClient) {
-      applyTheme(state.theme);
-    }
-  }, [state.theme, state.isClient]);
-
-  const handleThemeChange = (newTheme: Theme) => {
-    dispatch({ type: "CHANGE", theme: newTheme });
-  };
-
-  const getThemeIcon = () => {
-    switch (state.theme) {
-      case "light":
-        return <Sun className="h-4 w-4" />;
-      case "dark":
-        return <Moon className="h-4 w-4" />;
-      case "blue":
-        return (
-          <div
-            className="h-4 w-4 bg-blue-500 rounded-full"
-            aria-label="Blue theme"
-            role="img"
-          />
-        );
-      case "red":
-        return (
-          <div
-            className="h-4 w-4 bg-red-500 rounded-full"
-            aria-label="Red theme"
-            role="img"
-          />
-        );
-      default:
-        return <Palette className="h-4 w-4" />;
-    }
-  };
-
-  const getThemeLabel = () => {
-    switch (state.theme) {
-      case "light":
-        return "Light theme";
-      case "dark":
-        return "Dark theme";
-      case "blue":
-        return "Blue theme";
-      case "red":
-        return "Red theme";
-      default:
-        return "Select theme";
-    }
+  const handleChange = (next: Theme) => {
+    if (next === theme) return; // ✅ bail if same theme — no unnecessary DOM ops
+    setTheme(next);
+    applyTheme(next);
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" aria-label={getThemeLabel()}>
-          {getThemeIcon()}
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label={`Current theme: ${themeLabels[theme]}`}
+        >
+          {themeIcons[theme]}
           <span className="sr-only">Switch theme</span>
         </Button>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleThemeChange("light")}>
-          <Sun className="mr-2 h-4 w-4" />
-          <span>Light</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleThemeChange("dark")}>
-          <Moon className="mr-2 h-4 w-4" />
-          <span>Dark</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleThemeChange("blue")}>
-          <div
-            className="mr-2 h-4 w-4 bg-blue-500 rounded-full"
-            aria-hidden="true"
-          />
-          <span>Blue</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleThemeChange("red")}>
-          <div
-            className="mr-2 h-4 w-4 bg-red-500 rounded-full"
-            aria-hidden="true"
-          />
-          <span>Red</span>
-        </DropdownMenuItem>
+        {THEMES.map((t) => (
+          <DropdownMenuItem
+            key={t}
+            onClick={() => handleChange(t)}
+            className={theme === t ? "bg-muted" : ""}
+          >
+            {themeIcons[t]}
+            <span className="ml-2">{themeLabels[t]}</span>
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

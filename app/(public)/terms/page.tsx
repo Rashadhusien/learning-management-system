@@ -1,4 +1,4 @@
-import SectionTitle from "@/components/SectionTitle";
+import PageTitle from "@/components/PageTitle";
 import { Card, CardContent } from "@/components/ui/card";
 
 const TermsOfService = () => {
@@ -10,7 +10,7 @@ const TermsOfService = () => {
 
   return (
     <section className="container mx-auto py-8">
-      <SectionTitle
+      <PageTitle
         title="Terms of Service"
         description="Please read these terms carefully before using our learning platform."
       />

@@ -68,22 +68,9 @@ export const metadata: Metadata = {
       },
     ],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: {
-      default: "Cody - Learning Management System",
-      template: "%s | Cody LMS",
-    },
-    description:
-      "Master new skills with Cody's comprehensive learning management system.",
-    images: ["/graduation.ico"],
-  },
+
   icons: {
-    icon: [
-      { url: "/graduation.ico", sizes: "any" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-    ],
+    icon: [{ url: "/graduation.ico", sizes: "any" }],
     apple: [{ url: "/graduation.ico", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/site.webmanifest",
@@ -102,6 +89,23 @@ export default function RootLayout({
           src="https://upload-widget.cloudinary.com/latest/global/all.js"
           type="text/javascript"
           strategy="beforeInteractive"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var t = localStorage.getItem('theme');
+                  var valid = ['light','dark','blue','red'];
+                  if (!t || !valid.includes(t)) {
+                    t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  }
+                  document.documentElement.classList.add(t);
+                  document.documentElement.setAttribute('data-theme', t);
+                } catch(e) {}
+              })();
+            `,
+          }}
         />
       </head>
       <body

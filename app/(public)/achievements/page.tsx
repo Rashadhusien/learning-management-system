@@ -1,5 +1,5 @@
 import DataRenderer from "@/components/DataRenderer";
-import SectionTitle from "@/components/SectionTitle";
+import PageTitle from "@/components/PageTitle";
 import AchievementCard from "@/components/cards/AchievementCard";
 import CommonFilter from "@/components/filters/CommonFilter";
 import LocalSearch from "@/components/search/LocalSearch";
@@ -25,7 +25,7 @@ const Achievements = async ({ searchParams }: SearchParams) => {
 
   return (
     <section className="container mx-auto pb-20 ">
-      <SectionTitle
+      <PageTitle
         title="Achievements"
         description="Collect badges and trophies as you complete courses."
       />

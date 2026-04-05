@@ -1,8 +1,18 @@
-import SectionTitle from "@/components/SectionTitle";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, BookOpen, Users, Settings, CreditCard, Shield, Mail, Phone, MessageCircle } from "lucide-react";
+import {
+  Search,
+  BookOpen,
+  Users,
+  Settings,
+  CreditCard,
+  Shield,
+  Mail,
+  Phone,
+  MessageCircle,
+} from "lucide-react";
+import PageTitle from "@/components/PageTitle";
 
 const HelpCenter = () => {
   const helpCategories = [
@@ -12,11 +22,11 @@ const HelpCenter = () => {
       description: "Learn the basics of our platform",
       articles: [
         "Creating Your Account",
-        "Navigating the Dashboard", 
+        "Navigating the Dashboard",
         "Finding Courses",
-        "Understanding Your Profile"
+        "Understanding Your Profile",
       ],
-      color: "bg-blue-100 text-blue-600"
+      color: "bg-blue-100 text-blue-600",
     },
     {
       icon: Users,
@@ -26,9 +36,9 @@ const HelpCenter = () => {
         "Updating Personal Information",
         "Changing Your Password",
         "Profile Customization",
-        "Privacy Settings"
+        "Privacy Settings",
       ],
-      color: "bg-green-100 text-green-600"
+      color: "bg-green-100 text-green-600",
     },
     {
       icon: Settings,
@@ -38,9 +48,9 @@ const HelpCenter = () => {
         "Enrolling in Courses",
         "Course Navigation",
         "Submitting Assignments",
-        "Tracking Progress"
+        "Tracking Progress",
       ],
-      color: "bg-purple-100 text-purple-600"
+      color: "bg-purple-100 text-purple-600",
     },
     {
       icon: CreditCard,
@@ -50,9 +60,9 @@ const HelpCenter = () => {
         "Payment Methods",
         "Refund Policy",
         "Subscription Management",
-        "Invoice Requests"
+        "Invoice Requests",
       ],
-      color: "bg-yellow-100 text-yellow-600"
+      color: "bg-yellow-100 text-yellow-600",
     },
     {
       icon: Shield,
@@ -62,9 +72,9 @@ const HelpCenter = () => {
         "Two-Factor Authentication",
         "Privacy Settings",
         "Data Protection",
-        "Reporting Issues"
+        "Reporting Issues",
       ],
-      color: "bg-red-100 text-red-600"
+      color: "bg-red-100 text-red-600",
     },
     {
       icon: MessageCircle,
@@ -74,43 +84,43 @@ const HelpCenter = () => {
         "Forum Guidelines",
         "Finding Study Partners",
         "Joining Discussion Groups",
-        "Mentorship Programs"
+        "Mentorship Programs",
       ],
-      color: "bg-indigo-100 text-indigo-600"
-    }
+      color: "bg-indigo-100 text-indigo-600",
+    },
   ];
 
   const popularArticles = [
     {
       title: "How do I reset my password?",
       category: "Account & Profile",
-      views: "2.3k"
+      views: "2.3k",
     },
     {
       title: "Can I get a refund for a course?",
-      category: "Payments & Billing", 
-      views: "1.8k"
+      category: "Payments & Billing",
+      views: "1.8k",
     },
     {
       title: "How do I download course certificates?",
       category: "Courses & Learning",
-      views: "1.5k"
+      views: "1.5k",
     },
     {
       title: "What payment methods do you accept?",
       category: "Payments & Billing",
-      views: "1.2k"
+      views: "1.2k",
     },
     {
       title: "How do I enable two-factor authentication?",
       category: "Security & Privacy",
-      views: "987"
+      views: "987",
     },
     {
       title: "Can I change my username?",
       category: "Account & Profile",
-      views: "856"
-    }
+      views: "856",
+    },
   ];
 
   const contactOptions = [
@@ -119,27 +129,27 @@ const HelpCenter = () => {
       title: "Email Support",
       description: "Get help via email within 24 hours",
       value: "support@learningplatform.com",
-      action: "Send Email"
+      action: "Send Email",
     },
     {
       icon: MessageCircle,
       title: "Live Chat",
       description: "Chat with our support team in real-time",
       value: "Available Mon-Fri, 9AM-6PM EST",
-      action: "Start Chat"
+      action: "Start Chat",
     },
     {
       icon: Phone,
       title: "Phone Support",
       description: "Speak directly with our support team",
       value: "+1 (555) 123-4567",
-      action: "Call Now"
-    }
+      action: "Call Now",
+    },
   ];
 
   return (
     <section className="container mx-auto py-8">
-      <SectionTitle
+      <PageTitle
         title="Help Center"
         description="Find answers to your questions and get the support you need."
       />
@@ -167,7 +177,10 @@ const HelpCenter = () => {
         <h2 className="text-2xl font-bold mb-6">Browse by Category</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {helpCategories.map((category) => (
-            <Card key={category.title} className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Card
+              key={category.title}
+              className="hover:shadow-lg transition-shadow cursor-pointer"
+            >
               <CardHeader>
                 <div className="flex items-center space-x-3">
                   <div className={`p-2 rounded-lg ${category.color}`}>
@@ -175,14 +188,19 @@ const HelpCenter = () => {
                   </div>
                   <div>
                     <CardTitle className="text-lg">{category.title}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{category.description}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {category.description}
+                    </p>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
                   {category.articles.map((article) => (
-                    <li key={article} className="text-sm text-muted-foreground hover:text-foreground cursor-pointer transition-colors">
+                    <li
+                      key={article}
+                      className="text-sm text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                    >
                       • {article}
                     </li>
                   ))}
@@ -200,18 +218,21 @@ const HelpCenter = () => {
           <CardContent className="p-6">
             <div className="space-y-4">
               {popularArticles.map((article, index) => (
-                <div key={index} className="flex items-center justify-between py-3 border-b last:border-b-0 hover:bg-muted/50 px-3 rounded cursor-pointer transition-colors">
+                <div
+                  key={index}
+                  className="flex items-center justify-between py-3 border-b last:border-b-0 hover:bg-muted/50 px-3 rounded cursor-pointer transition-colors"
+                >
                   <div className="flex-1">
-                    <h3 className="font-medium text-foreground mb-1">{article.title}</h3>
+                    <h3 className="font-medium text-foreground mb-1">
+                      {article.title}
+                    </h3>
                     <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                       <span>{article.category}</span>
                       <span>•</span>
                       <span>{article.views} views</span>
                     </div>
                   </div>
-                  <div className="text-muted-foreground">
-                    →
-                  </div>
+                  <div className="text-muted-foreground">→</div>
                 </div>
               ))}
             </div>
@@ -258,7 +279,10 @@ const HelpCenter = () => {
         <h2 className="text-2xl font-bold mb-6">Still Need Help?</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {contactOptions.map((option) => (
-            <Card key={option.title} className="hover:shadow-lg transition-shadow">
+            <Card
+              key={option.title}
+              className="hover:shadow-lg transition-shadow"
+            >
               <CardContent className="p-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="p-2 bg-primary/10 rounded-lg">
@@ -266,7 +290,9 @@ const HelpCenter = () => {
                   </div>
                   <h3 className="font-semibold text-lg">{option.title}</h3>
                 </div>
-                <p className="text-muted-foreground mb-3">{option.description}</p>
+                <p className="text-muted-foreground mb-3">
+                  {option.description}
+                </p>
                 <p className="text-sm font-medium mb-4">{option.value}</p>
                 <button className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors">
                   {option.action}
@@ -283,19 +309,25 @@ const HelpCenter = () => {
         <div className="space-y-4">
           <Card>
             <CardContent className="p-6">
-              <h3 className="font-semibold mb-2">How do I get started with the platform?</h3>
+              <h3 className="font-semibold mb-2">
+                How do I get started with the platform?
+              </h3>
               <p className="text-muted-foreground">
-                Getting started is easy! Simply create an account, browse our course catalog, and enroll in courses 
-                that interest you. Our dashboard will guide you through the learning process.
+                Getting started is easy! Simply create an account, browse our
+                course catalog, and enroll in courses that interest you. Our
+                dashboard will guide you through the learning process.
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6">
-              <h3 className="font-semibold mb-2">Can I access courses offline?</h3>
+              <h3 className="font-semibold mb-2">
+                Can I access courses offline?
+              </h3>
               <p className="text-muted-foreground">
-                Currently, courses require an internet connection. However, you can download course materials 
-                for offline viewing through our mobile app.
+                Currently, courses require an internet connection. However, you
+                can download course materials for offline viewing through our
+                mobile app.
               </p>
             </CardContent>
           </Card>
@@ -303,8 +335,9 @@ const HelpCenter = () => {
             <CardContent className="p-6">
               <h3 className="font-semibold mb-2">Do you offer certificates?</h3>
               <p className="text-muted-foreground">
-                Yes! Upon successful completion of most courses, you will receive a certificate of completion 
-                that you can add to your resume or LinkedIn profile.
+                Yes! Upon successful completion of most courses, you will
+                receive a certificate of completion that you can add to your
+                resume or LinkedIn profile.
               </p>
             </CardContent>
           </Card>

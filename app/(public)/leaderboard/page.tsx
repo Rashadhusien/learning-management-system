@@ -1,4 +1,3 @@
-import SectionTitle from "@/components/SectionTitle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,6 +14,7 @@ import {
   getLeaderboard,
 } from "@/lib/actions/achievements.action";
 import CloudinaryImage from "@/components/Image";
+import PageTitle from "@/components/PageTitle";
 
 // Podium component for top 3
 function Podium({ topStudents }: { topStudents: LeaderboardStudent[] }) {
@@ -178,7 +178,7 @@ const Leaderboard = async () => {
 
   return (
     <section className="container mx-auto pt-8 pb-20">
-      <SectionTitle
+      <PageTitle
         title="Leaderboard"
         description="Discover the top students earning points through projects, courses, and challenges."
       />

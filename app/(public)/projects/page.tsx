@@ -1,5 +1,5 @@
 import DataRenderer from "@/components/DataRenderer";
-import SectionTitle from "@/components/SectionTitle";
+import PageTitle from "@/components/PageTitle";
 import ProjectCard from "@/components/cards/ProjectCard";
 import CommonFilter from "@/components/filters/CommonFilter";
 import LocalSearch from "@/components/search/LocalSearch";
@@ -23,7 +23,7 @@ const Projects = async ({ searchParams }: SearchParams) => {
   });
   return (
     <section className="container mx-auto pb-20">
-      <SectionTitle
+      <PageTitle
         title="Academy Projects"
         description="Explore our collection of coding projects with their point values and completion stats"
       />
