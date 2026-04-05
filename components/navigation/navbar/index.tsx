@@ -10,29 +10,38 @@ import { Button } from "@/components/ui/button";
 const Navbar = async () => {
   const session = await getAuthSession();
   return (
-    <nav className="p-2 bg-background/20 backdrop-blur-md border-b border-border/40 sticky top-0 z-50">
-      <div className="container mx-auto flex items-center justify-between md:justify-around">
-        <h1 className="text-3xl font-bold font-space-grotesk  text-primary">
-          <Link href={ROUTES.HOME}>Cody</Link>
-        </h1>
-        <div className="max-lg:hidden flex items-center gap-4 bg-background/30 px-4 rounded-full">
+    <nav className="px-4 py-2.5 bg-background/80 backdrop-blur-xl border-b border-border/30 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        {/* Logo */}
+        <Link href={ROUTES.HOME} className="flex items-center gap-1.5 shrink-0">
+          <span className="size-2 rounded-full bg-primary mb-0.5" />
+          <span className="text-[19px] font-semibold tracking-tight text-foreground font-space-grotesk">
+            Cody
+          </span>
+        </Link>
+
+        {/* Desktop nav links — pill container */}
+        <div className="hidden lg:flex items-center bg-muted/60 border border-border/40 rounded-full p-1 gap-0.5">
           <NavLinks />
         </div>
-        <div className="flex items-center gap-4 max-lg:hidden">
+
+        {/* Desktop right actions */}
+        <div className="hidden lg:flex items-center gap-2">
           {session ? (
             <UserDropdown />
           ) : (
             <Link href={ROUTES.LOGIN}>
-              <Button>log in</Button>
+              <Button size="sm" className="rounded-full px-5 h-8 text-sm">
+                Log in
+              </Button>
             </Link>
           )}
           <ThemeSwitcher />
         </div>
-        <div className="flex items-center gap-2 lg:hidden">
-          <div className="lg:hidden">
-            <ThemeSwitcher />
-          </div>
-          {/* <SidebarTrigger /> */}
+
+        {/* Mobile right actions */}
+        <div className="flex lg:hidden items-center gap-2">
+          <ThemeSwitcher />
           <MobileNavigation />
         </div>
       </div>

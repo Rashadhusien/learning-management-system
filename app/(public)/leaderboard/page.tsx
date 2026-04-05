@@ -1,5 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -8,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trophy, Medal, Award } from "lucide-react";
+import { Trophy } from "lucide-react";
 import {
   LeaderboardStudent,
   getLeaderboard,
@@ -16,152 +14,177 @@ import {
 import CloudinaryImage from "@/components/Image";
 import PageTitle from "@/components/PageTitle";
 
-// Podium component for top 3
-function Podium({ topStudents }: { topStudents: LeaderboardStudent[] }) {
-  const getPodiumPosition = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return {
-          icon: <Trophy className="w-10 h-10 text-yellow-400 drop-shadow-lg" />,
-          bgColor:
-            "bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500",
-          textColor: "text-white",
-          borderColor: "border-yellow-400",
-          shadowColor: "shadow-yellow-400/50",
-          height: "h-40",
-          cardHeight: "h-56",
-          zIndex: "z-30",
-          scale: "scale-110",
-          medal: "🥇",
-        };
-      case 2:
-        return {
-          icon: <Medal className="w-8 h-8 text-gray-300 drop-shadow-lg" />,
-          bgColor: "bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500",
-          textColor: "text-white",
-          borderColor: "border-gray-400",
-          shadowColor: "shadow-gray-400/50",
-          height: "h-40",
-          cardHeight: "h-48",
-          zIndex: "z-20",
-          scale: "scale-100",
-          medal: "🥈",
-        };
-      case 3:
-        return {
-          icon: <Award className="w-8 h-8 text-amber-600 drop-shadow-lg" />,
-          bgColor:
-            "bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800",
-          textColor: "text-white",
-          borderColor: "border-amber-700",
-          shadowColor: "shadow-amber-700/50",
-          height: "h-32",
-          cardHeight: "h-44",
-          zIndex: "z-20",
-          scale: "scale-100",
-          medal: "🥉",
-        };
-      default:
-        return null;
-    }
-  };
+// ─── Podium Card ────────────────────────────────────────────────────────────
 
-  // Position: 2nd left, 1st center, 3rd right
-  const podiumOrder = [2, 1, 3];
+const rankConfig = {
+  1: {
+    accent: "border-t-[3px] border-t-yellow-400",
+    ringBorder: "ring-2 ring-yellow-400",
+    pillBg: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+    base: "bg-yellow-400 h-16",
+    medal: "bg-yellow-400",
+    label: "1",
+    order: "order-2",
+    podiumHeight: "self-end",
+  },
+  2: {
+    accent: "border-t-[3px] border-t-slate-400",
+    ringBorder: "ring-2 ring-slate-400",
+    pillBg: "bg-slate-50 text-slate-600 border border-slate-200",
+    base: "bg-slate-400 h-12",
+    medal: "bg-slate-400",
+    label: "2",
+    order: "order-1",
+    podiumHeight: "self-end",
+  },
+  3: {
+    accent: "border-t-[3px] border-t-amber-700",
+    ringBorder: "ring-2 ring-amber-700",
+    pillBg: "bg-amber-50 text-amber-800 border border-amber-200",
+    base: "bg-amber-700 h-8",
+    medal: "bg-amber-700",
+    label: "3",
+    order: "order-3",
+    podiumHeight: "self-end",
+  },
+} as const;
+
+function PodiumCard({ student }: { student: LeaderboardStudent }) {
+  const rank = student.rank as 1 | 2 | 3;
+  const cfg = rankConfig[rank];
 
   return (
-    <div className="relative mb-5">
-      {/* Podium Platform */}
-      <div className="flex flex-col items-center md:flex-row justify-center md:items-end gap-8 mb-8 relative mt-8">
-        {podiumOrder.map((rank) => {
-          const student = topStudents.find((s) => s.rank === rank);
-          const position = getPodiumPosition(rank);
-
-          if (!student || !position) return null;
-
-          return (
-            <div
-              key={rank}
-              className={`relative flex flex-col  items-center ${position.zIndex} ${position.scale} transition-all duration-500 `}
-            >
-              {/* Student Card */}
-              <Card
-                className={`bg-muted  max-h-56 ${rank === 1 ? "mb-10" : rank === 2 ? "mb-5" : "mb-4"}  w-56 flex flex-col justify-center items-center text-center border ${position.borderColor} shadow-2xl ${position.shadowColor} transform transition-all duration-300 hover:shadow-3xl relative overflow-hidden`}
-              >
-                {/* Background Pattern */}
-                <div className="absolute inset-0 opacity-10">
-                  <div className="absolute inset-0 bg-linear-to-br from-white/20 to-transparent"></div>
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
-                </div>
-
-                <CardContent className="p-6 flex flex-col items-center justify-center h-full relative z-10">
-                  <div className="mb-4">
-                    <div className="relative">
-                      <CloudinaryImage
-                        src={student.imageCldPubId || "/default-avatar.png"}
-                        alt={student.name}
-                        width={80}
-                        height={80}
-                        className="rounded-full border-4 border-white shadow-xl w-20 h-20 object-cover"
-                      />
-                      <div className="absolute -bottom-1 -right-1 text-lg">
-                        {position.medal}
-                      </div>
-                    </div>
-                  </div>
-                  <h3
-                    className={`font-bold text-xl ${position.textColor} mb-1 drop-shadow-lg`}
-                  >
-                    {student.name}
-                  </h3>
-                  <p
-                    className={`text-sm ${position.textColor} opacity-90 mb-4`}
-                  >
-                    @{student.username}
-                  </p>
-                  <div className="space-y-3 w-full">
-                    <Badge
-                      variant="secondary"
-                      className="bg-white/25 text-white border-white/40 text-base px-3 py-2 w-full justify-center shadow-lg"
-                    >
-                      <span className="font-bold">
-                        {student.totalPoints.toLocaleString()}
-                      </span>{" "}
-                      points
-                    </Badge>
-                    <div className="flex gap-2 justify-center">
-                      <Badge
-                        variant="outline"
-                        className="text-xs bg-white/15 text-white border-white/30 px-2 py-1"
-                      >
-                        {student.totalProjects} projects
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className="text-xs bg-white/15 text-white border-white/30 px-2 py-1"
-                      >
-                        {student.totalCourses} courses
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+    <div
+      className={`flex flex-col items-center w-full max-w-[220px] ${cfg.order} ${cfg.podiumHeight}`}
+    >
+      {/* Card */}
+      <div
+        className={`w-full rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 ${cfg.accent} shadow-sm hover:-translate-y-1 transition-transform duration-200 overflow-hidden`}
+      >
+        <div className="p-4 flex flex-col items-center text-center gap-2">
+          {/* Avatar */}
+          <div className="relative">
+            <div className={`rounded-full ${cfg.ringBorder} p-0.5`}>
+              <CloudinaryImage
+                src={student.imageCldPubId || "/default-avatar.png"}
+                alt={student.name}
+                width={64}
+                height={64}
+                className="rounded-full w-16 h-16 object-cover"
+              />
             </div>
-          );
+            <span
+              className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full text-white text-[10px] font-bold flex items-center justify-center border-2 border-white dark:border-zinc-900 ${cfg.medal}`}
+            >
+              {cfg.label}
+            </span>
+          </div>
+
+          {/* Name */}
+          <div>
+            <p className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 leading-tight">
+              {student.name}
+            </p>
+            <p className="text-xs text-zinc-400">@{student.username}</p>
+          </div>
+
+          {/* Points */}
+          <span
+            className={`text-sm font-semibold px-3 py-1 rounded-full ${cfg.pillBg}`}
+          >
+            {student.totalPoints.toLocaleString()} pts
+          </span>
+
+          {/* Stats */}
+          <div className="flex gap-1.5">
+            <span className="text-[10px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+              {student.totalProjects} projects
+            </span>
+            <span className="text-[10px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+              {student.totalCourses} courses
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Podium base */}
+      <div
+        className={`w-full rounded-t-lg flex items-center justify-center text-white font-bold text-lg mt-2 ${cfg.base}`}
+      >
+        {cfg.label}
+      </div>
+    </div>
+  );
+}
+
+// ─── Podium Section ──────────────────────────────────────────────────────────
+
+function Podium({ topStudents }: { topStudents: LeaderboardStudent[] }) {
+  return (
+    <div className="mb-10">
+      {/* Desktop: side-by-side with podium bases */}
+      <div className="hidden sm:flex items-end justify-center gap-3 mb-0">
+        {[2, 1, 3].map((rank) => {
+          const student = topStudents.find((s) => s.rank === rank);
+          if (!student) return null;
+          return <PodiumCard key={rank} student={student} />;
         })}
       </div>
 
-      {/* Podium Shadow */}
-      <div className="flex justify-center gap-8">
-        {[2, 1, 3].map((rank) => {
-          const position = getPodiumPosition(rank);
-          if (!position) return null;
+      {/* Mobile: stacked vertically, no base */}
+      <div className="flex sm:hidden flex-col gap-3">
+        {[1, 2, 3].map((rank) => {
+          const student = topStudents.find((s) => s.rank === rank);
+          if (!student) return null;
+          const cfg = rankConfig[rank as 1 | 2 | 3];
           return (
             <div
-              key={`shadow-${rank}`}
-              className={`${rank === 1 ? "w-24" : rank === 2 ? "w-20" : "w-20"} h-4 bg-black/10 rounded-full blur-md -mt-2`}
-            ></div>
+              key={rank}
+              className={`flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 ${cfg.accent}`}
+            >
+              {/* Rank number */}
+              <div
+                className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0 ${cfg.medal}`}
+              >
+                {rank}
+              </div>
+
+              {/* Avatar */}
+              <div className={`rounded-full ${cfg.ringBorder} p-0.5 shrink-0`}>
+                <CloudinaryImage
+                  src={student.imageCldPubId || "/default-avatar.png"}
+                  alt={student.name}
+                  width={44}
+                  height={44}
+                  className="rounded-full w-11 h-11 object-cover"
+                />
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">
+                  {student.name}
+                </p>
+                <p className="text-xs text-zinc-400 truncate">
+                  @{student.username}
+                </p>
+                <div className="flex gap-1.5 mt-1">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+                    {student.totalProjects}P
+                  </span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+                    {student.totalCourses}C
+                  </span>
+                </div>
+              </div>
+
+              {/* Points */}
+              <span
+                className={`text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 ${cfg.pillBg}`}
+              >
+                {student.totalPoints.toLocaleString()}
+              </span>
+            </div>
           );
         })}
       </div>
@@ -169,88 +192,132 @@ function Podium({ topStudents }: { topStudents: LeaderboardStudent[] }) {
   );
 }
 
+// ─── Main Page ───────────────────────────────────────────────────────────────
+
 const Leaderboard = async () => {
   const leaderboardResult = await getLeaderboard();
   const allStudents = leaderboardResult.success ? leaderboardResult.data : [];
-  console.log(allStudents);
-  const top3 = allStudents.filter((student) => student.rank <= 3);
-  const rest = allStudents.filter((student) => student.rank > 3);
+  const top3 = allStudents.filter((s) => s.rank <= 3);
+  const rest = allStudents.filter((s) => s.rank > 3);
 
   return (
-    <section className="container mx-auto pt-8 pb-20">
+    <section className="container mx-auto px-4 pt-8 pb-20">
       <PageTitle
         title="Leaderboard"
         description="Discover the top students earning points through projects, courses, and challenges."
       />
 
-      {/* Top 3 Podium */}
-      {top3 && top3.length > 0 && <Podium topStudents={top3} />}
+      {/* Podium */}
+      {top3.length > 0 && <Podium topStudents={top3} />}
 
-      {/* Rest of the leaderboard table */}
+      {/* Full rankings table */}
       {rest.length > 0 && (
-        <Card className="mx-auto container">
-          <CardContent className="p-6">
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Trophy className="w-6 h-6 text-muted-foreground" />
-              Full Rankings
+        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900">
+          {/* Table header */}
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-zinc-200 dark:border-zinc-800">
+            <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+              <Trophy className="w-3.5 h-3.5 text-zinc-500" />
+            </div>
+            <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+              Full rankings
             </h3>
+          </div>
+
+          {/* Scrollable on small screens */}
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-16">Rank</TableHead>
-                  <TableHead>Student</TableHead>
-                  <TableHead className="text-center">Projects</TableHead>
-                  <TableHead className="text-center">Courses</TableHead>
-                  <TableHead className="text-right">Points</TableHead>
+                <TableRow className="bg-zinc-50 dark:bg-zinc-800/50">
+                  <TableHead className="w-14 text-xs uppercase tracking-wide text-zinc-400">
+                    Rank
+                  </TableHead>
+                  <TableHead className="text-xs uppercase tracking-wide text-zinc-400">
+                    Student
+                  </TableHead>
+                  <TableHead className="text-center text-xs uppercase tracking-wide text-zinc-400 hidden sm:table-cell">
+                    Projects
+                  </TableHead>
+                  <TableHead className="text-center text-xs uppercase tracking-wide text-zinc-400 hidden sm:table-cell">
+                    Courses
+                  </TableHead>
+                  <TableHead className="text-right text-xs uppercase tracking-wide text-zinc-400">
+                    Points
+                  </TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
                 {rest.map((student) => (
-                  <TableRow key={student.id} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">
-                      <Badge
-                        variant={student.rank <= 10 ? "default" : "secondary"}
-                      >
-                        #{student.rank}
-                      </Badge>
-                    </TableCell>
+                  <TableRow
+                    key={student.id}
+                    className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors"
+                  >
+                    {/* Rank */}
                     <TableCell>
-                      <div className="flex items-center gap-3">
+                      <span
+                        className={`inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-semibold ${
+                          student.rank <= 10
+                            ? "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
+                        }`}
+                      >
+                        {student.rank}
+                      </span>
+                    </TableCell>
+
+                    {/* Student */}
+                    <TableCell>
+                      <div className="flex items-center gap-2.5">
                         <CloudinaryImage
                           src={student.imageCldPubId || "/default-avatar.png"}
                           alt={student.name}
-                          width={40}
-                          height={40}
-                          className="rounded-full"
+                          width={36}
+                          height={36}
+                          className="rounded-full w-9 h-9 object-cover shrink-0"
                         />
-                        <div>
-                          <div className="font-medium">{student.name}</div>
-                          <div className="text-sm text-muted-foreground">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                            {student.name}
+                          </p>
+                          <p className="text-xs text-zinc-400 truncate">
                             @{student.username}
-                          </div>
+                          </p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant="outline">{student.totalProjects}</Badge>
+
+                    {/* Projects — hidden on mobile */}
+                    <TableCell className="text-center hidden sm:table-cell">
+                      <span className="text-xs px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+                        {student.totalProjects}
+                      </span>
                     </TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant="outline">{student.totalCourses}</Badge>
+
+                    {/* Courses — hidden on mobile */}
+                    <TableCell className="text-center hidden sm:table-cell">
+                      <span className="text-xs px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+                        {student.totalCourses}
+                      </span>
                     </TableCell>
-                    <TableCell className="text-right font-semibold">
-                      {student.totalPoints.toLocaleString()}
+
+                    {/* Points */}
+                    <TableCell className="text-right">
+                      <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                        {student.totalPoints.toLocaleString()}
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
+      {/* Empty state */}
       {allStudents.length === 0 && (
-        <div className="text-center text-muted-foreground py-8">
-          No students found in the leaderboard.
+        <div className="text-center text-zinc-400 py-16 text-sm">
+          No students found in the leaderboard yet.
         </div>
       )}
     </section>

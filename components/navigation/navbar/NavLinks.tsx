@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
-
 import { SheetClose } from "@/components/ui/sheet";
 import { adminLinks, sidebarLinks } from "@/constants";
 import { cn } from "@/lib/utils";
@@ -16,7 +15,6 @@ const NavLinks = ({
   isAdmin?: boolean;
 }) => {
   const pathname = usePathname();
-
   const links = isAdmin ? adminLinks : sidebarLinks;
 
   return (
@@ -30,41 +28,44 @@ const NavLinks = ({
           <Link
             href={item.route}
             className={cn(
-              "flex items-center justify-start gap-4  p-4 ",
-              !isMobileNav && isActive && "text-primary",
-              !isMobileNav && "hover:text-primary/70",
-              isMobileNav && "rounded-lg hover:bg-primary/10 ",
-              isMobileNav && isActive && "bg-primary/10 rounded-xl",
-              isAdmin && isActive && "bg-primary/10 rounded-xl",
+              "flex items-center gap-2.5 transition-all duration-150",
+              // Desktop pill style
+              !isMobileNav &&
+                !isAdmin &&
+                cn(
+                  "text-[13px] font-medium px-4 py-1.5 rounded-full",
+                  isActive
+                    ? "bg-background text-foreground shadow-sm border border-border/40"
+                    : "text-muted-foreground hover:text-foreground",
+                ),
+              // Mobile nav style
+              isMobileNav &&
+                cn(
+                  "text-[13px] font-medium px-3 py-2 rounded-lg",
+                  isActive
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+                ),
+              // Admin sidebar style
+              isAdmin &&
+                cn(
+                  "text-[13px] font-medium px-3 py-2 rounded-lg",
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                ),
             )}
           >
-            {item.imgUrl && isMobileNav && (
+            {item.imgUrl && (isMobileNav || isAdmin) && (
               <Image
                 src={item.imgUrl}
                 alt={item.label}
-                width={20}
-                height={20}
+                width={16}
+                height={16}
+                className={cn(isAdmin && "dark:invert", "opacity-70")}
               />
             )}
-
-            {item.imgUrl && isAdmin && (
-              <Image
-                src={item.imgUrl}
-                alt={item.label}
-                width={20}
-                height={20}
-                className={cn("dark:invert ")}
-              />
-            )}
-
-            <p
-              className={cn(
-                isActive ? "base-bold" : "base-medium",
-                !isMobileNav && "max-lg:hidden",
-              )}
-            >
-              {item.label}
-            </p>
+            <span>{item.label}</span>
           </Link>
         );
 

@@ -8,11 +8,9 @@ import type { Resolver } from "react-hook-form";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { InputGroup } from "@/components/ui/input-group";
-
 import { SubmitProjectSchema } from "@/lib/validations";
 import {
   Select,
@@ -26,230 +24,281 @@ import { getAllCourses } from "@/lib/actions/courses.action";
 import { getProjectsByCourse } from "@/lib/actions/projects.action";
 import { DialogClose } from "../ui/dialog";
 import { submitProject } from "@/lib/actions/project-submissions.action";
-// import { submitProject } from "@/lib/actions/projects.action";
+import {
+  BookOpen,
+  FolderOpen,
+  Github,
+  Globe,
+  Loader2,
+  X,
+  Upload,
+} from "lucide-react";
 
 type SubmitProjectFormData = z.infer<typeof SubmitProjectSchema>;
 
 const SubmitProjectForm = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-
   const [courses, setCourses] = useState<Course[]>([]);
-
   const [selectedCourseId, setSelectedCourseId] = useState("");
 
   const form = useForm<SubmitProjectFormData>({
     resolver: zodResolver(
       SubmitProjectSchema,
     ) as Resolver<SubmitProjectFormData>,
-    defaultValues: {
-      courseId: "",
-      projectId: "",
-      repoLink: "",
-      demoLink: "",
-    },
+    defaultValues: { courseId: "", projectId: "", repoLink: "", demoLink: "" },
   });
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const result = await getAllCourses({ page: 1, pageSize: 100 });
-        if (result.success && result.data) {
-          setCourses(result.data);
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
+        if (result.success && result.data) setCourses(result.data);
+      } catch (err) {
+        console.error("Error fetching courses:", err);
       }
     };
-
     fetchCourses();
   }, []);
 
   useEffect(() => {
-    if (!selectedCourseId) {
-      return;
-    }
-
-    const fetchCourseProjects = async () => {
+    if (!selectedCourseId) return;
+    const fetchProjects = async () => {
       try {
         const result = await getProjectsByCourse(selectedCourseId);
-        if (result.success && result.data) {
-          setProjects(result.data);
-        } else {
-          setProjects([]);
-        }
-      } catch (error) {
-        console.error("Error fetching projects:", error);
+        setProjects(result.success && result.data ? result.data : []);
+      } catch {
         setProjects([]);
       }
     };
-    fetchCourseProjects();
+    fetchProjects();
   }, [selectedCourseId]);
 
   const handleSubmit = async (data: SubmitProjectFormData) => {
-    console.log(data);
     try {
-      console.log("submiting project:", data);
-
-      // Call the create category action
       const result = await submitProject(data);
-
       if (result.success) {
-        toast.success("Success", {
-          description: "Project submitted successfully",
+        toast.success("Project submitted!", {
+          description: "Your submission has been recorded successfully.",
         });
-
-        // Reset form
         form.reset();
+        setSelectedCourseId("");
       } else {
-        toast.error("Error", {
-          description:
-            result.error || "Failed to submit project. Please try again.",
+        toast.error("Submission failed", {
+          description: result.error || "Please try again.",
         });
       }
-    } catch (error) {
-      console.error("Error submitting project:", error);
-      toast.error("Error", {
-        description: "Failed to submit project. Please try again.",
+    } catch {
+      toast.error("Submission failed", {
+        description: "An unexpected error occurred. Please try again.",
       });
     }
   };
 
+  const isSubmitting = form.formState.isSubmitting;
+
   return (
-    <Card className="w-full sm:max-w-2xl">
-      <CardContent>
-        <form
-          id="submit-project-form"
-          className="space-y-4"
-          onSubmit={form.handleSubmit(handleSubmit)}
-        >
-          <Controller
-            name={"courseId" as const}
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={`submit-project-${field}`}>
-                  Course <span className="text-orange-600">*</span>
-                </FieldLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    setSelectedCourseId(value);
-                  }}
-                  disabled={courses.length === 0}
+    <form
+      id="submit-project-form"
+      onSubmit={form.handleSubmit(handleSubmit)}
+      className="space-y-5"
+    >
+      {/* ── Course ────────────────────────────────────────────── */}
+      <Controller
+        name="courseId"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel
+              htmlFor="field-course"
+              className="body-medium text-foreground flex items-center gap-1.5 mb-1.5"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-primary" />
+              Course
+              <span className="text-primary ml-0.5">*</span>
+            </FieldLabel>
+            <Select
+              value={field.value}
+              onValueChange={(val) => {
+                field.onChange(val);
+                setSelectedCourseId(val);
+                form.setValue("projectId", "");
+              }}
+              disabled={courses.length === 0}
+            >
+              <SelectTrigger
+                id="field-course"
+                className="w-full h-10 rounded-xl border-border bg-background text-sm
+                           focus:ring-1 focus:ring-primary/30 focus:border-primary/60
+                           data-[invalid=true]:border-destructive transition-all no-focus"
+              >
+                <SelectValue placeholder="Select a course…" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                {courses.map((c) => (
+                  <SelectItem key={c.id} value={c.id} className="text-sm">
+                    {c.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+
+      {/* ── Project (conditional) ─────────────────────────────── */}
+      {selectedCourseId && (
+        <Controller
+          name="projectId"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel
+                htmlFor="field-project"
+                className="body-medium text-foreground flex items-center gap-1.5 mb-1.5"
+              >
+                <FolderOpen className="w-3.5 h-3.5 text-primary" />
+                Project
+                <span className="text-primary ml-0.5">*</span>
+              </FieldLabel>
+              <Select
+                value={field.value}
+                onValueChange={field.onChange}
+                disabled={projects.length === 0}
+              >
+                <SelectTrigger
+                  id="field-project"
+                  className="w-full h-10 rounded-xl border-border bg-background text-sm
+                             focus:ring-1 focus:ring-primary/30 focus:border-primary/60
+                             data-[invalid=true]:border-destructive transition-all no-focus"
                 >
-                  <SelectTrigger
-                    className="w-full"
-                    id={`submit-project-${field}`}
-                  >
-                    <SelectValue placeholder="Select Course" />
-                  </SelectTrigger>
-                  <SelectContent className="w-full">
-                    {courses.map((course) => (
-                      <SelectItem key={course.id} value={course.id}>
-                        {course.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          {selectedCourseId && (
-            <Controller
-              name={"projectId" as const}
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={`submit-project-${field}`}>
-                    Project <span className="text-orange-600">*</span>
-                  </FieldLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={projects.length === 0}
-                  >
-                    <SelectTrigger
-                      className="w-full"
-                      id={`submit-project-${field}`}
-                    >
-                      <SelectValue placeholder="Select Project" />
-                    </SelectTrigger>
-                    <SelectContent className="w-full">
-                      {projects.map((project) => (
-                        <SelectItem key={project.id} value={project.id}>
-                          {project.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+                  <SelectValue
+                    placeholder={
+                      projects.length === 0
+                        ? "No projects available"
+                        : "Select a project…"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {projects.map((p) => (
+                    <SelectItem key={p.id} value={p.id} className="text-sm">
+                      {p.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
           )}
-          <Controller
-            name={"repoLink" as const}
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="student-id">Github Link</FieldLabel>
-                <InputGroup>
-                  <Input
-                    {...field}
-                    id="student-id"
-                    placeholder="Github Link (optional)"
-                    aria-invalid={fieldState.invalid}
-                  />
-                </InputGroup>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-          <Controller
-            name={"demoLink" as const}
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="student-id">
-                  Live Preview <span className="text-orange-600">*</span>
-                </FieldLabel>
-                <InputGroup>
-                  <Input
-                    {...field}
-                    id="student-id"
-                    placeholder="Live Preview"
-                    aria-invalid={fieldState.invalid}
-                  />
-                </InputGroup>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-        </form>
-      </CardContent>
-      <CardFooter className="flex justify-end items-center w-full gap-4">
+        />
+      )}
+
+      {/* ── Links row ─────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Repo link */}
+        <Controller
+          name="repoLink"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel
+                htmlFor="field-repo"
+                className="body-medium text-foreground flex items-center gap-1.5 mb-1.5"
+              >
+                <Github className="w-3.5 h-3.5 text-primary" />
+                GitHub Link
+                <span className="small-regular text-muted-foreground ml-1">
+                  (optional)
+                </span>
+              </FieldLabel>
+              <InputGroup>
+                <Input
+                  {...field}
+                  id="field-repo"
+                  placeholder="https://github.com/…"
+                  aria-invalid={fieldState.invalid}
+                  className="h-10 rounded-xl border-border bg-background text-sm
+                             placeholder:text-muted-foreground/50 no-focus
+                             focus-visible:ring-1 focus-visible:ring-primary/30
+                             focus-visible:border-primary/60 transition-all"
+                />
+              </InputGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        {/* Demo link */}
+        <Controller
+          name="demoLink"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel
+                htmlFor="field-demo"
+                className="body-medium text-foreground flex items-center gap-1.5 mb-1.5"
+              >
+                <Globe className="w-3.5 h-3.5 text-primary" />
+                Live Preview
+                <span className="text-primary ml-0.5">*</span>
+              </FieldLabel>
+              <InputGroup>
+                <Input
+                  {...field}
+                  id="field-demo"
+                  placeholder="https://your-demo.com"
+                  aria-invalid={fieldState.invalid}
+                  className="h-10 rounded-xl border-border bg-background text-sm
+                             placeholder:text-muted-foreground/50 no-focus
+                             focus-visible:ring-1 focus-visible:ring-primary/30
+                             focus-visible:border-primary/60 transition-all"
+                />
+              </InputGroup>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </div>
+
+      {/* ── Divider ───────────────────────────────────────────── */}
+      <div className="h-px bg-border" />
+
+      {/* ── Footer actions ────────────────────────────────────── */}
+      <div className="flex items-center justify-end gap-3 pt-1">
         <DialogClose asChild>
-          <Button variant={"outline"}>Cancel</Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="gap-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary"
+          >
+            <X className="w-4 h-4" />
+            Cancel
+          </Button>
         </DialogClose>
+
         <Button
           type="submit"
           form="submit-project-form"
-          disabled={form.formState.isSubmitting}
+          disabled={isSubmitting}
+          className="gap-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground
+                     font-semibold px-6 shadow-sm transition-all active:scale-[0.98]
+                     disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {form.formState.isSubmitting ? "submitting..." : "Submit Project"}
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Submitting…
+            </>
+          ) : (
+            <>
+              <Upload className="w-4 h-4" />
+              Submit Project
+            </>
+          )}
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </form>
   );
 };
 

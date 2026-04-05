@@ -1,15 +1,13 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getProjectById } from "@/lib/actions/projects.action";
 import { getProjectSubmissions } from "@/lib/actions/project-submissions.action";
 import { ROUTES } from "@/constants/routes";
-import { ArrowLeft, Clock, Trophy, FolderOpen, Users } from "lucide-react";
+import { ArrowLeft, Trophy, Users, FolderOpen, Layers } from "lucide-react";
 import ProjectSubmissionsTable from "@/components/ProjectSubmissionsTable";
 import SubmitProjectDialog from "@/components/submit-project-dialg";
+
 interface ProjectDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -17,140 +15,170 @@ interface ProjectDetailPageProps {
 const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
   const { id } = await params;
 
-  // Validate that the ID looks like a UUID
   const uuidRegex =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  if (!uuidRegex.test(id)) {
-    console.error("Invalid project ID format:", id);
-    notFound();
-  }
+  if (!uuidRegex.test(id)) notFound();
 
   const { success, data: project } = await getProjectById(id);
+  const { data: submissions } = await getProjectSubmissions(id);
 
-  // Get project submissions data
-  const { success: submissionsSuccess, data: submissions } =
-    await getProjectSubmissions(id);
+  if (!success || !project) notFound();
 
-  if (!success || !project) {
-    notFound();
-  }
-
-  // console.log(submissions);
-
-  console.log(project);
+  const completedCount = submissions?.length || 0;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Back Button */}
-      <div className="mb-6">
-        <Button variant="ghost" asChild className="gap-2">
-          <Link href={ROUTES.PROJECTS}>
+    <div className="min-h-screen bg-background">
+      {/* ── Hero ─────────────────────────────────────────────────── */}
+      <div className="relative w-full h-[300px] sm:h-[380px] md:h-[440px] overflow-hidden">
+        <Image
+          src={project.imageCldPubId}
+          alt={project.title}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent" />
+
+        {/* Back */}
+        <div className="absolute top-5 left-4 sm:left-8">
+          <Link
+            href={ROUTES.PROJECTS}
+            className="inline-flex items-center gap-2 rounded-full border border-white/20
+                       bg-white/10 backdrop-blur-sm px-4 py-1.5 text-sm text-white
+                       hover:bg-white/20 transition-colors"
+          >
             <ArrowLeft className="w-4 h-4" />
-            Back to Projects
+            <span className="hidden sm:inline">Back to Projects</span>
           </Link>
-        </Button>
+        </div>
+
+        {/* Title */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8">
+          <div className="container mx-auto">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/80 px-3 py-1 text-xs font-medium text-primary-foreground mb-3">
+              <Layers className="w-3 h-3" />
+              Hands-on Project
+            </div>
+            <h1 className="h1-bold text-white max-w-2xl drop-shadow-md">
+              {project.title}
+            </h1>
+          </div>
+        </div>
       </div>
 
-      {/* Project Header */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2">
-          {/* Project Image */}
-          <Card className="relative aspect-video rounded-lg overflow-hidden mb-6">
-            <Image
-              src={project.imageCldPubId}
-              alt={project.title}
-              fill
-              className="object-contain"
-            />
-            <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                {project.title}
-              </h1>
+      {/* ── Body ─────────────────────────────────────────────────── */}
+      <div className="container mx-auto px-4 sm:px-6 py-8">
+        <div className="grid lg:grid-cols-3 gap-8 items-start">
+          {/* ── Main ─────────────────────────────────────────────── */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Stat chips */}
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                {
+                  icon: <Trophy className="w-5 h-5 text-primary" />,
+                  label: "Points Reward",
+                  value: `${project.points} pts`,
+                },
+                {
+                  icon: <Users className="w-5 h-5 text-primary" />,
+                  label: "Completed By",
+                  value: `${completedCount} student${completedCount !== 1 ? "s" : ""}`,
+                },
+              ].map(({ icon, label, value }) => (
+                <div
+                  key={label}
+                  className="flex flex-col items-center justify-center gap-1.5 rounded-xl
+                             border border-border bg-card px-4 py-5 shadow-xs
+                             hover:border-primary/40 hover:shadow-sm transition-all"
+                >
+                  {icon}
+                  <span className="small-medium text-muted-foreground">
+                    {label}
+                  </span>
+                  <span className="body-semibold text-foreground">{value}</span>
+                </div>
+              ))}
             </div>
-          </Card>
 
-          {/* Project Info Cards */}
-          <div className="grid grid-cols-2  gap-4 mb-8">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <Trophy className="w-6 h-6 mx-auto mb-2 text-yellow-500" />
-                <p className="text-sm text-muted-foreground">Points</p>
-                <p className="font-semibold">{project.points}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <Users className="w-6 h-6 mx-auto mb-2 text-blue-500" />
-                <p className="text-sm text-muted-foreground">Completed</p>
-                <p className="font-semibold">
-                  {submissions?.length || 0} Students
-                </p>
-              </CardContent>
-            </Card>
+            {/* About */}
+            {project.description && (
+              <div className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden">
+                <div className="flex items-center gap-2 px-6 py-4 border-b border-border">
+                  <FolderOpen className="w-4 h-4 text-primary" />
+                  <h2 className="h3-semibold text-foreground">
+                    About This Project
+                  </h2>
+                </div>
+                <div className="px-6 py-5">
+                  <p className="paragraph-regular text-muted-foreground leading-relaxed">
+                    {project.description}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Submissions table */}
+            <div className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden">
+              <ProjectSubmissionsTable
+                projectId={id}
+                initialData={submissions || []}
+              />
+            </div>
           </div>
 
-          {/* Description */}
-          {project.description && (
-            <Card>
-              <CardHeader>
-                <CardTitle>About This Project</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
-                  {project.description}
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          <Card className="sticky top-28">
-            <CardHeader>
-              <CardTitle className="text-center">Project Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                <p className="text-3xl font-bold">{project.points}</p>
-                <p className="text-sm text-muted-foreground">
+          {/* ── Sidebar ──────────────────────────────────────────── */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+              {/* Points header */}
+              <div className="primary-gradient px-6 py-6 text-center">
+                <p className="text-primary-foreground/70 text-sm mb-1">
                   Points Available
                 </p>
+                <p className="text-4xl font-bold text-primary-foreground tracking-tight">
+                  {project.points}
+                </p>
+                <p className="text-primary-foreground/60 text-xs mt-1">
+                  upon completion
+                </p>
               </div>
 
-              <div className="space-y-2">
-                <Badge variant={"outline"} className="flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-yellow-500" />
-                  <span className="text-sm">
-                    {project.points} points reward
-                  </span>
-                </Badge>
-                <Badge variant={"outline"} className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm">
-                    {submissions?.length || 0} students completed
-                  </span>
-                </Badge>
-                <Badge variant={"outline"} className="flex items-center gap-2">
-                  <FolderOpen className="w-4 h-4 text-green-500" />
-                  <span className="text-sm">Hands-on project</span>
-                </Badge>
+              {/* Detail rows */}
+              <div className="px-6 py-5 space-y-3 border-b border-border">
+                {[
+                  {
+                    icon: <Trophy className="w-4 h-4 text-primary" />,
+                    text: `${project.points} points reward`,
+                  },
+                  {
+                    icon: <Users className="w-4 h-4 text-primary" />,
+                    text: `${completedCount} students completed`,
+                  },
+                  {
+                    icon: <FolderOpen className="w-4 h-4 text-primary" />,
+                    text: "Hands-on project",
+                  },
+                ].map(({ icon, text }) => (
+                  <div
+                    key={text}
+                    className="flex items-center gap-3 rounded-xl bg-secondary/60 px-3 py-2.5"
+                  >
+                    {icon}
+                    <span className="body-medium text-foreground">{text}</span>
+                  </div>
+                ))}
               </div>
 
-              <SubmitProjectDialog />
-            </CardContent>
-          </Card>
+              {/* CTA */}
+              <div className="px-6 py-5">
+                <SubmitProjectDialog />
+                <p className="text-center small-regular text-muted-foreground mt-3">
+                  Submit your work to earn points
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Student Submissions */}
-      <div className="mt-10">
-        <ProjectSubmissionsTable
-          projectId={id}
-          initialData={submissions || []}
-        />
       </div>
     </div>
   );

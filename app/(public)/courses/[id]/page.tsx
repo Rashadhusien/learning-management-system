@@ -3,14 +3,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCourseById } from "@/lib/actions/courses.action";
 import {
   isStudentEnrolled,
   getCourseEnrollments,
 } from "@/lib/actions/enrollments.action";
 import { ROUTES } from "@/constants/routes";
-import { ArrowLeft, Clock, DollarSign, BookOpen, User } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock,
+  DollarSign,
+  BookOpen,
+  User,
+  BarChart2,
+  Tag,
+} from "lucide-react";
 import EnrollButton from "@/components/EnrollButton";
 import CourseEnrollmentsTable from "@/components/CourseEnrollmentsTable";
 
@@ -21,151 +28,173 @@ interface CourseDetailPageProps {
 const CourseDetailPage = async ({ params }: CourseDetailPageProps) => {
   const { id } = await params;
 
-  // Validate that the ID looks like a UUID
   const uuidRegex =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   if (!uuidRegex.test(id)) {
-    console.error("Invalid course ID format:", id);
     notFound();
   }
 
   const { success, data: course } = await getCourseById(id);
+  const { data: isEnrolled } = await isStudentEnrolled(id);
+  const { data: enrolledStudents } = await getCourseEnrollments(id);
 
-  // Check if user is already enrolled
-  const { success: enrollmentCheckSuccess, data: isEnrolled } =
-    await isStudentEnrolled(id);
-
-  // Get enrolled students data
-  const { success: enrollmentsSuccess, data: enrolledStudents } =
-    await getCourseEnrollments(id);
-
-  if (!success || !course) {
-    notFound();
-  }
+  if (!success || !course) notFound();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Back Button */}
-      <div className="mb-6">
-        <Button variant="ghost" asChild className="gap-2">
-          <Link href={ROUTES.COURSES}>
-            <ArrowLeft className="w-4 h-4" />
-            Back to Courses
-          </Link>
-        </Button>
+    <div className="min-h-screen bg-background">
+      {/* ── Hero ────────────────────────────────────────────────── */}
+      <div className="relative w-full h-[340px] sm:h-[420px] md:h-[480px] overflow-hidden">
+        <Image
+          src={course.bannerUrl}
+          alt={course.title}
+          fill
+          className="object-cover"
+          priority
+        />
+        {/* dark + primary gradient overlay */}
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-primary/30 to-transparent" />
+
+        {/* Back button */}
+        <div className="absolute top-5 left-4 sm:left-8">
+          <Button
+            variant="ghost"
+            asChild
+            size="sm"
+            className="gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm rounded-full px-4"
+          >
+            <Link href={ROUTES.COURSES}>
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Back to Courses</span>
+            </Link>
+          </Button>
+        </div>
+
+        {/* Hero text */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 sm:px-8 pb-8">
+          <div className="container mx-auto">
+            <Badge className="mb-3 bg-primary/90 hover:bg-primary text-primary-foreground border-0 rounded-full px-3 py-1 text-xs font-medium">
+              {course.category?.name || "Uncategorized"}
+            </Badge>
+            <h1 className="h1-bold text-white max-w-2xl drop-shadow-md">
+              {course.title}
+            </h1>
+          </div>
+        </div>
       </div>
 
-      {/* Course Header */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2">
-          {/* Banner Image */}
-          <div className="relative aspect-video rounded-lg overflow-hidden mb-6">
-            <Image
-              src={course.bannerUrl}
-              alt={course.title}
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4">
-              <Badge variant="secondary" className="mb-2">
-                {course.category?.name || "Uncategorized"}
-              </Badge>
-              <h1 className="text-3xl font-bold text-white mb-2">
-                {course.title}
-              </h1>
+      {/* ── Body ────────────────────────────────────────────────── */}
+      <div className="container mx-auto px-4 sm:px-6 py-8">
+        <div className="grid lg:grid-cols-3 gap-8 items-start">
+          {/* ── Left / Main ───────────────────────────────────────── */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Stat chips */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                {
+                  icon: <Clock className="w-5 h-5 text-primary" />,
+                  label: "Duration",
+                  value: `${course.duration}h`,
+                },
+                {
+                  icon: <DollarSign className="w-5 h-5 text-primary" />,
+                  label: "Price",
+                  value: `$${course.price}`,
+                },
+                {
+                  icon: <BarChart2 className="w-5 h-5 text-primary" />,
+                  label: "Level",
+                  value: course.level,
+                },
+                {
+                  icon: <User className="w-5 h-5 text-primary" />,
+                  label: "Instructor",
+                  value: "Expert",
+                },
+              ].map(({ icon, label, value }) => (
+                <div
+                  key={label}
+                  className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-border bg-card p-4 shadow-xs hover:border-primary/40 hover:shadow-sm transition-all"
+                >
+                  {icon}
+                  <span className="small-medium text-muted-foreground">
+                    {label}
+                  </span>
+                  <span className="body-semibold text-foreground">{value}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* About */}
+            <div className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden">
+              <div className="px-6 py-4 border-b border-border flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-primary" />
+                <h2 className="h3-semibold text-foreground">
+                  About This Course
+                </h2>
+              </div>
+              <div className="px-6 py-5">
+                <p className="paragraph-regular text-muted-foreground leading-relaxed">
+                  {course.description}
+                </p>
+              </div>
+            </div>
+
+            {/* Enrollments table */}
+            <div className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden">
+              <CourseEnrollmentsTable initialData={enrolledStudents || []} />
             </div>
           </div>
 
-          {/* Course Info Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <Clock className="w-6 h-6 mx-auto mb-2 text-blue-500" />
-                <p className="text-sm text-muted-foreground">Duration</p>
-                <p className="font-semibold">{course.duration} hours</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <DollarSign className="w-6 h-6 mx-auto mb-2 text-green-500" />
-                <p className="text-sm text-muted-foreground">Price</p>
-                <p className="font-semibold">${course.price}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <BookOpen className="w-6 h-6 mx-auto mb-2 text-purple-500" />
-                <p className="text-sm text-muted-foreground">Level</p>
-                <p className="font-semibold">{course.level}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <User className="w-6 h-6 mx-auto mb-2 text-orange-500" />
-                <p className="text-sm text-muted-foreground">Instructor</p>
-                <p className="font-semibold">Expert</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Description */}
-          <Card>
-            <CardHeader>
-              <CardTitle>About This Course</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground leading-relaxed">
-                {course.description}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          <Card className="sticky top-28">
-            <CardHeader>
-              <CardTitle className="text-center">Enroll Now</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                <p className="text-3xl font-bold">${course.price}</p>
-                <p className="text-sm text-muted-foreground">
+          {/* ── Sidebar ───────────────────────────────────────────── */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+              {/* Price header */}
+              <div className="primary-gradient px-6 py-6 text-center">
+                <p className="text-primary-foreground/70 text-sm mb-1">
                   One-time payment
+                </p>
+                <p className="text-4xl font-bold text-primary-foreground tracking-tight">
+                  ${course.price}
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Badge variant={"outline"} className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm">
-                    {course.duration} hours of content
-                  </span>
-                </Badge>
-                <Badge variant={"outline"} className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-purple-500" />
-                  <span className="text-sm">{course.level} level</span>
-                </Badge>
-                <Badge variant={"outline"} className="flex items-center gap-2">
-                  <span className="text-sm">
-                    {course.category?.name || "Uncategorized"}
-                  </span>
-                </Badge>
+              {/* Details */}
+              <div className="px-6 py-5 space-y-3 border-b border-border">
+                {[
+                  {
+                    icon: <Clock className="w-4 h-4 text-primary" />,
+                    text: `${course.duration} hours of content`,
+                  },
+                  {
+                    icon: <BarChart2 className="w-4 h-4 text-primary" />,
+                    text: `${course.level} level`,
+                  },
+                  {
+                    icon: <Tag className="w-4 h-4 text-primary" />,
+                    text: course.category?.name || "Uncategorized",
+                  },
+                ].map(({ icon, text }) => (
+                  <div
+                    key={text}
+                    className="flex items-center gap-3 rounded-xl bg-secondary/60 px-3 py-2.5"
+                  >
+                    {icon}
+                    <span className="body-medium text-foreground">{text}</span>
+                  </div>
+                ))}
               </div>
 
-              <EnrollButton courseId={id} isEnrolled={isEnrolled || false} />
-            </CardContent>
-          </Card>
+              {/* CTA */}
+              <div className="px-6 py-5">
+                <EnrollButton courseId={id} isEnrolled={isEnrolled || false} />
+                <p className="text-center small-regular text-muted-foreground mt-3">
+                  Instant access after enrollment
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div className="mt-10">
-        <CourseEnrollmentsTable
-          courseId={id}
-          initialData={enrolledStudents || []}
-        />
       </div>
     </div>
   );
