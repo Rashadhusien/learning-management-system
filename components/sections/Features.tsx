@@ -23,22 +23,6 @@ const Features = () => {
 
   useGSAP(
     () => {
-      gsap.utils.toArray<HTMLElement>(".feat-card").forEach((card, i) => {
-        gsap.from(card, {
-          opacity: 0,
-          y: 40,
-          duration: 0.4,
-          ease: "back.out(1.7)",
-          delay: i * 0.08,
-
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 10%",
-            once: true,
-          },
-        });
-      });
-
       // Icon pop per card
       gsap.utils.toArray<HTMLElement>(".feat-icon").forEach((icon, i) => {
         gsap.from(icon, {
@@ -49,7 +33,7 @@ const Features = () => {
           delay: i * 0.08,
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 10%",
+            start: "top 50%",
             once: true,
           },
         });

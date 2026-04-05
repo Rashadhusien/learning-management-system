@@ -38,17 +38,11 @@ const LatestProjectsAndCourses = ({
       });
 
       // SectionTitle handles its own animations, so we only need to animate the content
-      tl.from(".col-header", {
-        opacity: 0,
-        y: 16,
-        duration: 0.45,
-        stagger: 0.12,
-      })
-        .from(
-          ".proj-card",
-          { opacity: 0, x: -24, duration: 0.45, stagger: 0.1 },
-          "-=0.25",
-        )
+      tl.from(
+        ".proj-card",
+        { opacity: 0, x: -24, duration: 0.45, stagger: 0.1 },
+        "-=0.25",
+      )
         .from(
           ".course-card",
           { opacity: 0, x: 24, duration: 0.45, stagger: 0.1 },

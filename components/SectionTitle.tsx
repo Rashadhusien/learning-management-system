@@ -25,6 +25,25 @@ const SectionTitle = ({
 
   useGSAP(
     () => {
+      if (!ref.current) return;
+
+      // ── 1. Split DOM first, before any GSAP timeline is created ──
+      //    This way the layout mutation happens before ScrollTrigger
+      //    measures anything, and tweens get correct start times.
+      const titleEl = ref.current.querySelector<HTMLElement>(".st-title");
+      const descEl = ref.current.querySelector<HTMLElement>(".st-desc");
+
+      const titleInners = titleEl ? splitText(titleEl, "lines").inners : [];
+      const descInners = descEl ? splitText(descEl, "words").inners : [];
+
+      // ── 2. Set initial states immediately after split ──
+      //    Prevents flash of unstyled content on fast scrolls
+      gsap.set(".st-badge", { opacity: 0, y: -14 });
+      if (titleInners.length) gsap.set(titleInners, { yPercent: 110 });
+      if (descInners.length)
+        gsap.set(descInners, { yPercent: 100, opacity: 0 });
+
+      // ── 3. Now build the timeline — DOM is stable, no more mutations ──
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: ref.current,
@@ -34,39 +53,30 @@ const SectionTitle = ({
         defaults: { ease: "power3.out" },
       });
 
-      // ✅ Badge animates first
-      // tl.from(".st-badge", { opacity: 0, y: -14, duration: 0.45 });
+      tl.to(".st-badge", { opacity: 1, y: 0, duration: 0.45 });
 
-      // ✅ Title split reveal
-      const titleEl = ref.current?.querySelector<HTMLElement>(".st-title");
-      if (titleEl) {
-        const { inners } = splitText(titleEl, "lines");
-        tl.from(
-          inners,
+      if (titleInners.length) {
+        tl.to(
+          titleInners,
           {
-            yPercent: 110,
+            yPercent: 0,
             duration: 0.85,
             stagger: 0.12,
-            ease: "power3.out",
-            delay: 0.1,
           },
-          "-=0.1",
+          "-=0.2",
         );
       }
-      const descEl = ref.current?.querySelector<HTMLElement>(".st-desc");
-      if (descEl) {
-        const { inners } = splitText(descEl, "words");
-        tl.from(
-          inners,
+
+      if (descInners.length) {
+        tl.to(
+          descInners,
           {
-            yPercent: 100,
-            opacity: 0,
+            yPercent: 0,
+            opacity: 1,
             duration: 0.5,
             stagger: 0.03,
-            ease: "power2.out",
-            delay: 0.2,
           },
-          "-=0.5",
+          "-=0.4",
         );
       }
     },
@@ -78,10 +88,10 @@ const SectionTitle = ({
         {badgeIcon ? badgeIcon : <LayoutGrid />}
         {badge}
       </Badge>
-      <h2 className="st-title text-4xl font-bold mb-3 tracking-tight">
+      <h2 className="st-title text-3xl sm:text-4xl font-bold mb-3 tracking-tight">
         {title}
       </h2>
-      <p className="st-desc text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+      <p className="st-desc text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
         {description}
       </p>
     </div>

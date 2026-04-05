@@ -139,8 +139,7 @@ const Testimonials = () => {
           badge="Success Stories"
           title={
             <>
-              What our <SectionTitleMarker marker="Students" />
-              say
+              What our <SectionTitleMarker marker="Students " /> say
             </>
           }
           description="Join thousands of successful learners who transformed their careers with our platform."

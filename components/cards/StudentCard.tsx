@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -16,7 +15,7 @@ import UserAvatar from "../UserAvatar";
 export default function StudentCard({ student }: { student: User }) {
   const { id, name, imageCldPubId, email, totalPoints, level } = student;
   return (
-    <Card className="group relative mx-auto w-full max-w-sm transition-transform duration-300 hover:shadow-lg hover:scale-105">
+    <Card className="group relative mx-auto w-full max-w-sm transition-transform duration-300 hover:shadow-lg">
       <CardHeader className="text-center pb-3">
         <div className="flex justify-center mb-4">
           <UserAvatar

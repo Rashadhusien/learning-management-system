@@ -56,25 +56,7 @@ const CourseCategories = () => {
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 75%",
-          once: true,
-        },
-        defaults: { ease: "power3.out", clearProps: "all" },
-      });
-
-      // SectionTitle handles its own animations, so we only need to animate the content
-      tl.from(".cc-card", {
-        opacity: 0,
-        y: 36,
-        scale: 0.96,
-        duration: 0.5,
-        stagger: 0.09,
-      });
-
-      // Icon rings pop after cards land
+      // // Icon rings pop after cards land
       gsap.utils.toArray<HTMLElement>(".cc-icon").forEach((icon, i) => {
         gsap.from(icon, {
           scale: 0.3,
@@ -85,6 +67,7 @@ const CourseCategories = () => {
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 85%",
+            end: "bottom 15%",
             once: true,
           },
         });
@@ -117,7 +100,7 @@ const CourseCategories = () => {
           badge="Categories"
           title={
             <>
-              Explore our <SectionTitleMarker marker="Course" /> categories
+              Explore our <SectionTitleMarker marker="Course" /> Categories
             </>
           }
           description="Choose from a wide range of categories designed to help you achieve your learning goals."

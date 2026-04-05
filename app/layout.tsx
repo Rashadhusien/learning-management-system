@@ -90,23 +90,6 @@ export default function RootLayout({
           type="text/javascript"
           strategy="beforeInteractive"
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var t = localStorage.getItem('theme');
-                  var valid = ['light','dark','blue','red'];
-                  if (!t || !valid.includes(t)) {
-                    t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                  }
-                  document.documentElement.classList.add(t);
-                  document.documentElement.setAttribute('data-theme', t);
-                } catch(e) {}
-              })();
-            `,
-          }}
-        />
       </head>
       <body
         className={`${inter.className} ${spaceGrotesk.variable} antialiased`}

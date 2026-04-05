@@ -28,14 +28,7 @@ const Hero = () => {
         defaults: { ease: "power3.out", clearProps: "all" },
       });
 
-      tl.from(".hero-badge", { opacity: 0, y: -20, duration: 0.6 })
-
-        .from(
-          ".hero-feature",
-          { opacity: 0, y: 20, duration: 0.5, stagger: 0.1 },
-          "-=0.3",
-        )
-        .from(".hero-buttons", { opacity: 0, y: 20, duration: 0.5 }, "-=0.2");
+      tl.from(".hero-badge", { opacity: 0, y: -20, duration: 0.6 });
 
       const descEl =
         heroRef.current?.querySelector<HTMLElement>(".hero-description");
@@ -98,10 +91,10 @@ const Hero = () => {
             ].map((feature, index) => (
               <div
                 key={index}
-                className="hero-feature flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full border border-border/50"
+                className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full border border-border/50"
               >
-                <feature.icon className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-foreground">
+                <feature.icon className="size-3 sm:size-4 text-primary" />
+                <span className="text-xs sm:text-sm font-medium text-foreground">
                   {feature.text}
                 </span>
               </div>
@@ -112,11 +105,11 @@ const Hero = () => {
             <Link href="/courses">
               <Button
                 size="lg"
-                className="hero-primary-btn group relative overflow-hidden"
+                className="hero-primary-btn w-48 sm:w-auto group relative overflow-hidden"
               >
                 <span className="relative z-10 flex items-center">
                   Explore Courses
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
                 </span>
                 <div className="absolute inset-0 bg-primary/20 blur-md -z-10"></div>
               </Button>
@@ -125,10 +118,10 @@ const Hero = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="hero-secondary-btn group hover:border-primary hover:text-primary transition-all duration-300"
+                className="hero-secondary-btn w-48 sm:w-auto group hover:border-primary hover:text-primary transition-all duration-300"
               >
                 Get Started
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
           </div>

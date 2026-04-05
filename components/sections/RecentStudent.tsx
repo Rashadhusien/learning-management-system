@@ -30,17 +30,7 @@ const RecentStudent = ({ students }: { students: User[] }) => {
       });
 
       // Header cascade
-      tl.from(
-        ".rs-card",
-        {
-          opacity: 0,
-          y: 32,
-          scale: 0.97,
-          duration: 0.5,
-          stagger: { amount: 0.45, from: "start" },
-        },
-        "-=0.2",
-      ).from(".rs-btn", { opacity: 0, y: 12, duration: 0.4 }, "-=0.15");
+      tl.from(".rs-btn", { opacity: 0, y: 12, duration: 0.4 }, "-=0.15");
 
       // Avatar pop — runs in parallel after cards land
       gsap.utils.toArray<HTMLElement>(".rs-avatar").forEach((av, i) => {

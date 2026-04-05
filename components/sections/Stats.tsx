@@ -38,7 +38,19 @@ const Stats = () => {
 
   useGSAP(
     () => {
-      // Items slide up staggered
+      // ✅ Guard — bail early if ref isn't attached yet
+      if (!sectionRef.current) return;
+
+      const section = sectionRef.current;
+
+      // Shared ScrollTrigger config — define once, reuse
+      const st = (start = "top 85%") => ({
+        trigger: section,
+        start,
+        once: true,
+      });
+
+      // Items slide up
       gsap.from(".stat-item", {
         opacity: 0,
         y: 24,
@@ -46,11 +58,7 @@ const Stats = () => {
         stagger: 0.1,
         ease: "power3.out",
         clearProps: "all",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 75%",
-          once: true,
-        },
+        scrollTrigger: st("top 75%"),
       });
 
       // Icons pop in
@@ -61,16 +69,12 @@ const Stats = () => {
           duration: 0.4,
           ease: "back.out(2)",
           delay: 0.15 + i * 0.1,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 85%",
-            once: true,
-          },
+          scrollTrigger: st(),
         });
       });
 
-      // Counter animation for numeric stats
-      document.querySelectorAll<HTMLElement>(".stat-counter").forEach((el) => {
+      // ✅ Scoped query — not document.querySelectorAll
+      section.querySelectorAll<HTMLElement>(".stat-counter").forEach((el) => {
         const target = parseInt(el.dataset.target ?? "0");
         const isLocale = el.dataset.format === "localeString";
         const obj = { v: 0 };
@@ -80,11 +84,7 @@ const Stats = () => {
           duration: 1.8,
           ease: "power2.out",
           delay: 0.3,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 85%",
-            once: true,
-          },
+          scrollTrigger: st(),
           onUpdate() {
             const val = Math.round(obj.v);
             el.textContent = isLocale ? val.toLocaleString() : String(val);
@@ -123,12 +123,10 @@ const Stats = () => {
                 ${i < 2 ? "border-b md:border-b-0 border-border/40" : ""}
               `}
               >
-                {/* Icon */}
                 <div className="stat-icon mb-3 opacity-35">
                   <Icon className="w-7 h-7 text-foreground" strokeWidth={1.5} />
                 </div>
 
-                {/* Value */}
                 <div className="stat-value flex items-baseline gap-0.5 mb-1">
                   {display ? (
                     <span className="font-space-grotesk text-4xl text-foreground tracking-tight">
@@ -150,7 +148,6 @@ const Stats = () => {
                   )}
                 </div>
 
-                {/* Label */}
                 <div className="text-xs text-muted-foreground tracking-widest uppercase">
                   {label}
                 </div>

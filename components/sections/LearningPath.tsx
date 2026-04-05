@@ -167,9 +167,7 @@ const LearningPath = () => {
           badge="Learning Paths"
           title={
             <>
-              Your
-              <SectionTitleMarker marker="structured" />
-              learning journey
+              Your <SectionTitleMarker marker="structured" /> learning journey
             </>
           }
           description="Follow our carefully crafted learning paths to master new skills step by step."
