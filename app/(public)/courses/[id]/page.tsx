@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import EnrollButton from "@/components/EnrollButton";
 import CourseEnrollmentsTable from "@/components/CourseEnrollmentsTable";
+import CourseContent from "@/components/CourseContent";
+import { rockPaperScissorsCourse } from "@/data/sample-course";
 
 interface CourseDetailPageProps {
   params: Promise<{ id: string }>;
@@ -141,6 +143,13 @@ const CourseDetailPage = async ({ params }: CourseDetailPageProps) => {
                 </p>
               </div>
             </div>
+
+            <CourseContent
+              courseId={rockPaperScissorsCourse.id}
+              lessons={rockPaperScissorsCourse.lessons || []}
+              chapters={rockPaperScissorsCourse.chapters}
+              isEnrolled={false}
+            />
 
             {/* Enrollments table */}
             <div className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden">

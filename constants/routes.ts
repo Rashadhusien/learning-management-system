@@ -8,6 +8,8 @@ export const ROUTES = {
   PROFILE_ACHIEVEMENTS: "/profile/achievements",
   COURSES: "/courses",
   COURSE_DETAIL: (id: string) => `/courses/${id}`,
+  LESSON: (courseId: string, lessonId: string) =>
+    `/courses/${courseId}/lectures/${lessonId}`,
   PROJECTS: "/projects",
   PROJECT_DETAILS: (id: string) => `/projects/${id}`,
   STUDENTS: "/students",

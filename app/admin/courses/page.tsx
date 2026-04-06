@@ -5,6 +5,7 @@ import { getAllCourses } from "@/lib/actions/courses.action";
 import DataRenderer from "@/components/DataRenderer";
 import { EMYPTY_COURSE } from "@/constants/states";
 import { CoursesTableWrapper } from "@/components/tables/Admin/Courses/CoursesTableWrapper";
+import CourseContent from "@/components/CourseContent";
 
 const AdminCourses = async () => {
   const courses = await getAllCourses({

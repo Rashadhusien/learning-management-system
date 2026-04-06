@@ -72,6 +72,179 @@ export interface CreateCourseParams {
   isPublished: boolean;
 }
 
+// types/action.d.ts
+
+export interface CourseChapter {
+  id: string;
+  courseId: string;
+  title: string;
+  description?: string | null;
+  order: number;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  // ✅ Populated when fetching chapter with its lessons
+  lessons?: CourseLesson[];
+}
+
+export interface CourseLesson {
+  id: string;
+  courseId: string;
+  // ✅ Direct FK instead of junction table
+  chapterId?: string | null;
+  title: string;
+  description?: string | null;
+  content?: string | null;
+  videoUrl?: string | null;
+  // ✅ duration in SECONDS
+  duration: number;
+  lessonType: "video" | "text" | "project" | "quiz" | "assignment";
+  order: number;
+  isPublished: boolean;
+  isRequired: boolean;
+  projectInstructions?: string | null;
+  starterCode?: string | null;
+  solutionCode?: string | null;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  // ✅ Populated relation — used by LessonPlayer sidebar grouping
+  chapter?: Pick<CourseChapter, "id" | "title" | "order"> | null;
+  resources?: LessonResource[];
+}
+
+export interface LessonResource {
+  id: string;
+  lessonId: string;
+  title: string;
+  description?: string | null;
+  resourceType: "file" | "link" | "video" | "image" | "code";
+  fileUrl?: string | null;
+  fileName?: string | null;
+  fileSize?: number | null;
+  cloudinaryPublicId?: string | null;
+  url?: string | null;
+  code?: string | null;
+  language?: string | null;
+  order: number;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface StudentLessonProgress {
+  id: string;
+  studentId: string;
+  lessonId: string;
+  status: "not_started" | "in_progress" | "completed";
+  progressPercent: number;
+  // ✅ timeSpent in SECONDS
+  timeSpent: number;
+  projectSubmitted: boolean;
+  projectSubmissionId?: string | null;
+  startedAt?: Date | null;
+  completedAt?: Date | null;
+  lastAccessedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  lesson?: CourseLesson;
+  projectSubmission?: ProjectSubmission;
+}
+
+export interface StudentCourseProgress {
+  studentId: string;
+  courseId: string;
+  totalLessons: number;
+  completedLessons: number;
+  progressPercent: number;
+  // ✅ totalTimeSpent in SECONDS
+  totalTimeSpent: number;
+  lastAccessedAt: Date;
+  videoLessonsCompleted: number;
+  projectLessonsCompleted: number;
+  quizLessonsCompleted: number;
+  textLessonsCompleted: number;
+}
+
+export interface CourseWithLessons extends Course {
+  lessons?: CourseLesson[];
+  chapters?: CourseChapter[];
+  totalLessons?: number;
+  completedLessons?: number;
+  // ✅ estimatedDuration in SECONDS (sum of lesson durations)
+  estimatedDuration?: number;
+}
+
+export interface StudentCourseWithProgress extends CourseWithLessons {
+  enrolledAt: Date;
+  progress?: StudentCourseProgress;
+  lessonsProgress?: StudentLessonProgress[];
+}
+
+// ── Params (unchanged shape, notes added) ────────────────────────────
+
+export interface CreateLessonParams {
+  courseId: string;
+  chapterId?: string; // ✅ direct FK, not via junction
+  title: string;
+  description?: string;
+  content?: string;
+  videoUrl?: string;
+  duration: number; // in seconds
+  lessonType: "video" | "text" | "project" | "quiz" | "assignment";
+  order: number;
+  isPublished?: boolean;
+  isRequired?: boolean;
+  projectInstructions?: string;
+  starterCode?: string;
+  solutionCode?: string;
+}
+
+export interface UpdateLessonParams {
+  chapterId?: string | null;
+  title?: string;
+  description?: string;
+  content?: string;
+  videoUrl?: string;
+  duration?: number; // in seconds
+  lessonType?: "video" | "text" | "project" | "quiz" | "assignment";
+  order?: number;
+  isPublished?: boolean;
+  isRequired?: boolean;
+  projectInstructions?: string;
+  starterCode?: string;
+  solutionCode?: string;
+}
+
+export interface CreateChapterParams {
+  courseId: string;
+  title: string;
+  description?: string;
+  order: number;
+}
+
+export interface CreateResourceParams {
+  lessonId: string;
+  title: string;
+  description?: string;
+  resourceType: "file" | "link" | "video" | "image" | "code";
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  cloudinaryPublicId?: string;
+  url?: string;
+  code?: string;
+  language?: string;
+  order?: number;
+}
+
+export interface LessonProgressUpdateParams {
+  lessonProgressId: string;
+  progressPercent?: number;
+  timeSpent?: number; // additional seconds in this session
+  status?: "not_started" | "in_progress" | "completed";
+}
+
 export interface Category {
   id: string;
   name: string;

@@ -214,6 +214,159 @@ export const achievements = pgTable("achievements", {
   ...baseSchema,
 });
 
+export const lessonTypeEnum = pgEnum("lesson_type", [
+  "video",
+  "text",
+  "project",
+  "quiz",
+  "assignment",
+]);
+
+export const resourceTypeEnum = pgEnum("resource_type", [
+  "file",
+  "link",
+  "video",
+  "image",
+  "code",
+]);
+
+export const progressStatusEnum = pgEnum("progress_status", [
+  "not_started",
+  "in_progress",
+  "completed",
+]);
+
+export const courseChapters = pgTable(
+  "course_chapters",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => courses.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    order: integer("order").notNull(),
+    isDeleted: boolean("is_deleted").default(false).notNull(),
+    ...baseSchema,
+  },
+  (table) => ({
+    courseChapterOrderIndex: index("course_chapter_order_idx").on(
+      table.courseId,
+      table.order,
+    ),
+  }),
+);
+
+export const courseLessons = pgTable(
+  "course_lessons",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    courseId: uuid("course_id")
+      .notNull()
+      .references(() => courses.id, { onDelete: "cascade" }),
+
+    // ✅ Direct FK — replaces the junction table chapterLessons
+    chapterId: uuid("chapter_id").references(() => courseChapters.id, {
+      onDelete: "set null",
+    }),
+
+    title: text("title").notNull(),
+    description: text("description"),
+    content: text("content"),
+    videoUrl: text("video_url"),
+
+    // ✅ duration in SECONDS (matches seed data: 41s, 363s, etc.)
+    duration: integer("duration").notNull(),
+
+    lessonType: lessonTypeEnum("lesson_type").default("text").notNull(),
+    order: integer("order").notNull(),
+    isPublished: boolean("is_published").default(false).notNull(),
+    isRequired: boolean("is_required").default(true).notNull(),
+
+    projectInstructions: text("project_instructions"),
+    starterCode: text("starter_code"),
+    solutionCode: text("solution_code"),
+
+    isDeleted: boolean("is_deleted").default(false).notNull(),
+    ...baseSchema,
+  },
+  (table) => ({
+    courseOrderIndex: index("course_lesson_order_idx").on(
+      table.courseId,
+      table.order,
+    ),
+    // ✅ Index for fetching all lessons in a chapter
+    chapterIndex: index("course_lesson_chapter_idx").on(table.chapterId),
+  }),
+);
+
+export const lessonResources = pgTable(
+  "lesson_resources",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    lessonId: uuid("lesson_id")
+      .notNull()
+      .references(() => courseLessons.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    resourceType: resourceTypeEnum("resource_type").notNull(),
+    fileUrl: text("file_url"),
+    fileName: text("file_name"),
+    fileSize: integer("file_size"),
+    cloudinaryPublicId: text("cloudinary_public_id"),
+    url: text("url"),
+    code: text("code"),
+    language: text("language"),
+    order: integer("order").default(0).notNull(),
+    isDeleted: boolean("is_deleted").default(false).notNull(),
+    ...baseSchema,
+  },
+  (table) => ({
+    lessonOrderIndex: index("lesson_resource_order_idx").on(
+      table.lessonId,
+      table.order,
+    ),
+  }),
+);
+
+export const studentLessonProgress = pgTable(
+  "student_lesson_progress",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    lessonId: uuid("lesson_id")
+      .notNull()
+      .references(() => courseLessons.id, { onDelete: "cascade" }),
+    status: progressStatusEnum("status").default("not_started").notNull(),
+    progressPercent: integer("progress_percent").default(0).notNull(),
+
+    // ✅ timeSpent in SECONDS for precision
+    timeSpent: integer("time_spent").default(0).notNull(),
+
+    projectSubmitted: boolean("project_submitted").default(false).notNull(),
+    projectSubmissionId: uuid("project_submission_id").references(
+      () => projectSubmissions.id,
+      { onDelete: "set null" },
+    ),
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    lastAccessedAt: timestamp("last_accessed_at").defaultNow().notNull(),
+    ...baseSchema,
+  },
+  (table) => ({
+    uniqueStudentLesson: uniqueIndex("unique_student_lesson").on(
+      table.studentId,
+      table.lessonId,
+    ),
+    // ✅ Index for fetching all progress for a student in a course
+    studentIndex: index("student_lesson_progress_student_idx").on(
+      table.studentId,
+    ),
+  }),
+);
+
 export const studentAchievements = pgTable(
   "student_achievements",
   {

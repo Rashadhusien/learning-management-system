@@ -16,7 +16,7 @@ export function CoursesTableWrapper({ data }: CoursesTableWrapperProps) {
   const handleView = (course: Course) => {
     console.log("View course:", course);
     // Navigate to course details page
-    router.push(`/courses/${course.id}`);
+    router.push(`/admin/courses/${course.id}`);
   };
 
   const handleEdit = (course: Course) => {
