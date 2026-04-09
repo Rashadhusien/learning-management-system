@@ -21,7 +21,8 @@ import {
 import EnrollButton from "@/components/EnrollButton";
 import CourseEnrollmentsTable from "@/components/CourseEnrollmentsTable";
 import CourseContent from "@/components/CourseContent";
-import { rockPaperScissorsCourse } from "@/data/sample-course";
+import { getCourseChapters } from "@/lib/actions/lectures.action";
+import { isAdmin } from "@/lib/auth-wrapper";
 
 interface CourseDetailPageProps {
   params: Promise<{ id: string }>;
@@ -39,6 +40,8 @@ const CourseDetailPage = async ({ params }: CourseDetailPageProps) => {
   const { success, data: course } = await getCourseById(id);
   const { data: isEnrolled } = await isStudentEnrolled(id);
   const { data: enrolledStudents } = await getCourseEnrollments(id);
+
+  const { data: chapters } = await getCourseChapters(id);
 
   if (!success || !course) notFound();
 
@@ -145,10 +148,9 @@ const CourseDetailPage = async ({ params }: CourseDetailPageProps) => {
             </div>
 
             <CourseContent
-              courseId={rockPaperScissorsCourse.id}
-              lessons={rockPaperScissorsCourse.lessons || []}
-              chapters={rockPaperScissorsCourse.chapters}
-              isEnrolled={false}
+              courseId={id}
+              chapters={chapters}
+              isEnrolled={isEnrolled}
             />
 
             {/* Enrollments table */}
@@ -198,7 +200,18 @@ const CourseDetailPage = async ({ params }: CourseDetailPageProps) => {
 
               {/* CTA */}
               <div className="px-6 py-5">
-                <EnrollButton courseId={id} isEnrolled={isEnrolled || false} />
+                {(await isAdmin()) ? (
+                  <Button className="w-full">
+                    <Link href={ROUTES.ADMIN_COURSE_DETAILS(id)}>
+                      Manage Course
+                    </Link>
+                  </Button>
+                ) : (
+                  <EnrollButton
+                    courseId={id}
+                    isEnrolled={isEnrolled || false}
+                  />
+                )}
                 <p className="text-center small-regular text-muted-foreground mt-3">
                   Instant access after enrollment
                 </p>

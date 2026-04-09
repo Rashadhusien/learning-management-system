@@ -67,7 +67,7 @@ const Hero = () => {
             New Learning Experience
           </Badge>
 
-          <h1 className=" text-4xl sm:text-7xl lg:text-8xl xl:text-9xl  font-black tracking-tight text-foreground leading-tight mb-4">
+          <h1 className=" text-4xl sm:text-7xl lg:text-8xl xl:text-8xl  font-black  tracking-wide text-foreground leading-tight mb-4">
             Learn, Build,{" "}
             <span className="relative">
               <span className="text-primary relative z-10">Achieve</span>

@@ -150,3 +150,57 @@ export const EditProfileSchema = z.object({
   imageCldPubId: z.string().optional(),
   coverCldPubId: z.string().optional(),
 });
+
+export const createLectureSchema = z.object({
+  courseId: z.string().uuid("Invalid course ID"),
+  title: z.string().min(3, "Title must be at least 3 characters").max(255),
+  description: z.string().max(1000).optional(),
+  type: z.enum(["video", "article", "pdf"]).default("video"),
+  videoUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  articleContent: z.string().optional(),
+  duration: z.coerce.number().min(0).default(0),
+  isFree: z.boolean().default(false),
+  isPublished: z.boolean().default(false),
+});
+export const updateLectureSchema = createLectureSchema
+  .omit({ courseId: true })
+  .partial()
+  .extend({
+    order: z.number().int().min(0).optional(),
+  });
+export const createChapterSchema = z.object({
+  courseId: z.string().uuid("Invalid course ID"),
+
+  title: z.string().min(3, "Title must be at least 3 characters").max(255),
+  description: z.string().max(1000).optional(),
+  order: z.number().int().min(0),
+});
+
+export const createLessonSchema = z.object({
+  courseId: z.uuid("Invalid course ID"),
+  chapterId: z.uuid("Invalid chapter ID"),
+
+  title: z.string().min(3, "Title must be at least 3 characters").max(255),
+  description: z.string().max(1000).optional(),
+  content: z.string().optional(),
+  videoUrl: z.url("Invalid video URL").optional().or(z.literal("")),
+
+  duration: z
+    .number()
+    .int()
+    .min(0, "Duration must be a positive number in seconds"),
+  lessonType: z
+    .enum(["video", "text", "project", "quiz", "assignment"])
+    .default("text"),
+  order: z.number().int().min(0, "Order must be a positive number"),
+  isPublished: z.boolean().default(false),
+  isRequired: z.boolean().default(true),
+
+  projectInstructions: z.string().optional(),
+  starterCode: z.string().optional(),
+  solutionCode: z.string().optional(),
+});
+
+export type CreateLectureInput = z.infer<typeof createLectureSchema>;
+export type CreateChapterInput = z.infer<typeof createChapterSchema>;
+export type CreateLessonInput = z.infer<typeof createLessonSchema>;

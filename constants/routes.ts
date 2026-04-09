@@ -24,6 +24,7 @@ export const ROUTES = {
   ADMIN: "/admin",
   ADMIN_COURSES: "/admin/courses",
   ADMIN_CREATE_COURSE: "/admin/courses/create",
+  ADMIN_COURSE_DETAILS: (id: string) => `/admin/courses/${id}`,
   ADMIN_EDIT_COURSE: (id: string) => `/admin/courses/${id}/edit`,
   ADMIN_CATEGORIES: "/admin/categories",
   ADMIN_CREATE_CATEGORY: "/admin/categories/create",

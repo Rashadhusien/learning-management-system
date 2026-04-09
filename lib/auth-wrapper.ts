@@ -8,3 +8,9 @@ export async function getAuthSession() {
     return null;
   }
 }
+
+export async function isAdmin() {
+  const session = await getAuthSession();
+
+  return session?.user?.role === "admin";
+}

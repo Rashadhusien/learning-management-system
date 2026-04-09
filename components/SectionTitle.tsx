@@ -88,7 +88,7 @@ const SectionTitle = ({
         {badgeIcon ? badgeIcon : <LayoutGrid />}
         {badge}
       </Badge>
-      <h2 className="st-title text-3xl sm:text-4xl font-bold mb-3 tracking-tight">
+      <h2 className="st-title text-3xl sm:text-4xl   font-bold mb-3 tracking-wide">
         {title}
       </h2>
       <p className="st-desc text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">

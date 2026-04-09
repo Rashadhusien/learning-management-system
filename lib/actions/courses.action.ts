@@ -295,7 +295,7 @@ export async function getCourseById(
   if (!uuidRegex.test(courseId)) {
     return {
       success: false,
-      error: "Invalid course ID format",
+      error: { message: "Invalid course ID format" },
     };
   }
 
@@ -313,7 +313,7 @@ export async function getCourseById(
     if (course.length === 0) {
       return {
         success: false,
-        error: "Course not found",
+        error: { message: "Course not found" },
       };
     }
 

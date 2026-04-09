@@ -129,6 +129,22 @@ export async function isStudentEnrolled(
   }
 
   try {
+    // Get user details to check role
+    const user = await db
+      .select({ role: users.role })
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
+
+    // Admin users are enrolled in all courses
+    if (user.length > 0 && user[0].role === "admin") {
+      return {
+        success: true,
+        data: true,
+      };
+    }
+
+    // Check actual enrollment for students
     const enrollment = await db
       .select()
       .from(enrollments)

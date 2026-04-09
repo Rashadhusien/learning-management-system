@@ -80,3 +80,26 @@ export const adminLinks = [
     label: " Submissions",
   },
 ];
+
+export const LESSONTYPES = [
+  {
+    value: "text",
+    label: "Text",
+  },
+  {
+    value: "video",
+    label: "Video",
+  },
+  {
+    value: "project",
+    label: "Project",
+  },
+  {
+    value: "quiz",
+    label: "Quiz",
+  },
+  {
+    value: "assignment",
+    label: "Assignment",
+  },
+];

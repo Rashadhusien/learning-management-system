@@ -1,34 +1,58 @@
 // app/(student)/courses/[courseId]/lessons/[lessonId]/page.tsx
 
-import LecturePlayer from "@/components/lectures/LecturePlayer";
-import { rockPaperScissorsCourse } from "@/data/sample-course";
+import LectrueContent from "@/components/lectures/lectrue-content";
+import LectureSidebar from "@/components/navigation/LectureSidebar";
+import { getCourseById } from "@/lib/actions/courses.action";
+import {
+  getCourseLectures,
+  getLectureById,
+  getCourseChapters,
+} from "@/lib/actions/lectures.action";
 import { notFound } from "next/navigation";
+import { CourseWithLessons } from "@/types/action";
 
 interface Props {
-  params: Promise<{ courseId: string; lectureId: string }>;
+  params: Promise<{ id: string; lectureId: string }>;
 }
 
 export default async function LessonPage({ params }: Props) {
-  const { courseId, lectureId } = await params;
-  const course = rockPaperScissorsCourse; // replace with your DB fetch
-  const lesson = course.lessons?.find((l) => l.id === lectureId);
-  console.log(courseId, lectureId);
-  if (!lesson) notFound();
+  const { id: courseId, lectureId } = await params;
 
-  const currentIndex =
-    course.lessons
-      ?.sort((a, b) => a.order - b.order)
-      .findIndex((l) => l.id === lectureId) ?? -1;
+  // Fetch the specific lecture
+  const lectureResult = await getLectureById(lectureId);
 
-  const prevLesson = course.lessons?.[currentIndex - 1] ?? null;
-  const nextLesson = course.lessons?.[currentIndex + 1] ?? null;
+  const { data: lesson } = lectureResult;
+
+  // Fetch course, lessons, and chapters for navigation
+  const courseResult = await getCourseById(courseId);
+  const lessonsResult = await getCourseLectures(courseId);
+  const chaptersResult = await getCourseChapters(courseId);
+
+  const course = courseResult.success ? courseResult.data : null;
+  const lessons = lessonsResult.success ? lessonsResult.data : null;
+  const chapters = chaptersResult.success ? chaptersResult.data : null;
+
+  if (!chapters || !course || !lesson) {
+    notFound();
+  }
+
+  // Construct CourseWithLessons data structure
+  const courseWithLessons: CourseWithLessons = {
+    ...course,
+    chapters,
+    lessons: lessons || undefined,
+  };
 
   return (
-    <LecturePlayer
-      course={course}
-      currentLesson={lesson}
-      prevLesson={prevLesson}
-      nextLesson={nextLesson}
-    />
+    <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-background">
+      {/* ── Sidebar ─────────────────────────────────────────────────── */}
+      <LectureSidebar
+        chapters={chapters}
+        courseId={courseId}
+        currentLessonId={lectureId}
+      />
+
+      <LectrueContent course={courseWithLessons} currentLesson={lesson} />
+    </div>
   );
 }
