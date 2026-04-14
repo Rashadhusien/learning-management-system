@@ -6,26 +6,32 @@ import {
   getRecentStudents,
 } from "@/lib/actions/stats.action";
 import Features from "@/components/sections/Features";
-import LatestProjectsAndCourses from "@/components/sections/LatestProjectsAndCourses";
 import RecentStudent from "@/components/sections/RecentStudent";
 import Stats from "@/components/sections/Stats";
 import CourseCategories from "@/components/sections/CourseCategories";
 import LearningPath from "@/components/sections/LearningPath";
 import Testimonials from "@/components/sections/Testimonials";
 import CTA from "@/components/sections/CTA";
-import GlobalReach from "@/components/sections/GlobalReach";
+import LatestProjects from "@/components/sections/LatestProjects";
+import LatestCourses from "@/components/sections/LatestCourses";
+import { getRecentCategories } from "@/lib/actions/categories.action";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const session = await getAuthSession();
 
-  const [coursesResponse, projectsResponse, studentsResponse] =
-    await Promise.all([
-      getRecentCourses(),
-      getRecentProjects(),
-      getRecentStudents(),
-    ]);
+  const [
+    coursesResponse,
+    projectsResponse,
+    studentsResponse,
+    categoriesResponse,
+  ] = await Promise.all([
+    getRecentCourses(),
+    getRecentProjects(),
+    getRecentStudents(),
+    getRecentCategories(),
+  ]);
 
   const courses =
     coursesResponse.success && coursesResponse.data
@@ -40,34 +46,32 @@ export default async function Home() {
       ? studentsResponse.data.students
       : [];
 
+  const categories =
+    categoriesResponse.success && categoriesResponse.data
+      ? categoriesResponse.data
+      : [];
+
   return (
     <main className="min-h-screen">
       <Hero />
 
-      {/* Features Section */}
       <Features />
 
-      {/* Latest Projects & Courses */}
-      <LatestProjectsAndCourses projects={projects} courses={courses} />
+      <LatestCourses courses={courses} />
 
-      {/* Recent Students Section */}
+      <LatestProjects projects={projects} />
+
       <RecentStudent students={students} />
 
-      {/* Stats Section */}
       <Stats />
-      {/* Course Categories */}
-      <CourseCategories />
-      {/* Learning Path Section */}
+
+      <CourseCategories categories={categories} />
+
       <LearningPath />
 
-      {/* Testimonials */}
       <Testimonials />
 
-      {/* CTA Section */}
       <CTA session={session} />
-
-      {/* Global Reach Section */}
-      <GlobalReach />
     </main>
   );
 }

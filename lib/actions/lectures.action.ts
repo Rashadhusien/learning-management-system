@@ -167,6 +167,7 @@ export async function createLesson(
       })
       .returning({ id: courseLessons.id });
 
+    revalidatePath(`/admin/courses`);
     revalidatePath(`/admin/courses/${validated.courseId}`);
     revalidatePath(`/courses/${validated.courseId}`);
 

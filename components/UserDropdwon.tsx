@@ -43,69 +43,95 @@ export async function UserDropdown({
         <Button
           variant="ghost"
           className={cn(
-            "rounded-full bg-background py-6 justify-start",
-            isMobile && "py-7",
+            "rounded-full bg-background hover:bg-accent/50 transition-colors h-10 px-3 gap-2",
+            isMobile && "h-12 px-4 gap-3 w-full justify-start",
           )}
         >
           <UserAvatar
             id={session?.user?.id || ""}
             name={profile?.name || ""}
             imageUrl={profile?.imageCldPubId || ""}
+            className={isMobile ? "h-8 w-8" : "h-7 w-7"}
           />
-          <h2>{profile?.name}</h2>
-          {isMobile ? <ChevronRightIcon /> : <ChevronDownIcon />}
+          {!isMobile && (
+            <span className="text-sm font-medium truncate max-w-20">
+              {profile?.name}
+            </span>
+          )}
+          {isMobile && (
+            <span className="text-sm font-medium truncate flex-1 text-left">
+              {profile?.name}
+            </span>
+          )}
+          {isMobile ? (
+            <ChevronRightIcon className="h-4 w-4 shrink-0" />
+          ) : (
+            <ChevronDownIcon className="h-4 w-4 shrink-0" />
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuGroup>
+      <DropdownMenuContent
+        align="end"
+        className={cn("w-48 min-w-0", isMobile && "w-56")}
+      >
+        <DropdownMenuGroup className="p-1">
           {role === "admin" && (
             <DropdownMenuItem asChild>
-              <Link href={ROUTES.ADMIN} className="flex items-center gap-2">
-                <LayoutDashboardIcon className="h-4 w-4" />
-                Admin Panel
+              <Link
+                href={ROUTES.ADMIN}
+                className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors text-sm"
+              >
+                <LayoutDashboardIcon className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Admin Panel</span>
               </Link>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem asChild>
-            <Link href={ROUTES.PROFILE} className="flex items-center gap-2">
-              <BadgeCheckIcon className="h-4 w-4" />
-              Profile
+            <Link
+              href={ROUTES.PROFILE}
+              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors text-sm"
+            >
+              <BadgeCheckIcon className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Profile</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link
               href={ROUTES.PROFILE_COURSES}
-              className="flex items-center gap-2"
+              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors text-sm"
             >
-              <BookOpenIcon className="h-4 w-4" />
-              My Courses
+              <BookOpenIcon className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">My Courses</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link
               href={ROUTES.PROFILE_PROJECTS}
-              className="flex items-center gap-2"
+              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors text-sm"
             >
-              <FolderIcon className="h-4 w-4" />
-              My Projects
+              <FolderIcon className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">My Projects</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link
               href={ROUTES.PROFILE_ACHIEVEMENTS}
-              className="flex items-center gap-2"
+              className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors text-sm"
             >
-              <TrophyIcon className="h-4 w-4" />
-              My Achievements
+              <TrophyIcon className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">Achievements</span>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="my-1" />
         <DropdownMenuItem asChild>
           <form action={signOutAction} className="w-full">
-            <button type="submit" className="flex items-center gap-2 w-full">
+            <button
+              type="submit"
+              className="flex items-center gap-3 px-3 py-2 w-full rounded-md hover:bg-accent transition-colors text-sm font-medium text-destructive hover:text-destructive"
+            >
               <LogOutIcon className="h-4 w-4" />
-              Sign Out
+              <span>Sign Out</span>
             </button>
           </form>
         </DropdownMenuItem>

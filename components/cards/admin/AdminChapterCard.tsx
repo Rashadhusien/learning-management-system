@@ -77,7 +77,7 @@ const AdminChapterCard = ({
                 </Button>
               ) : (
                 <CreateLessonForm
-                  courseId={chapter.id}
+                  courseId={chapter.courseId}
                   chapterId={chapter.id}
                   setShowLessonForm={setShowLessonForm}
                 />

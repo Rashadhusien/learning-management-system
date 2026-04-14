@@ -1,4 +1,3 @@
-// components/lesson/LessonPlayer.tsx
 "use client";
 
 import { useState, useRef } from "react";
@@ -8,7 +7,6 @@ import Link from "next/link";
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
   FileText,
   Code,
   CheckCircle,
@@ -21,6 +19,8 @@ import { cn, formatDuration } from "@/lib/utils";
 import { ROUTES } from "@/constants/routes";
 import { CourseWithLessons, CourseLesson } from "@/types/action.d";
 import ReactPlayer from "react-player";
+import { Button } from "../ui/button";
+import { VideoPlayer } from "../player";
 
 gsap.registerPlugin(useGSAP);
 
@@ -80,8 +80,8 @@ export default function LectrueContent({
       className="flex flex-col flex-1 h-full no-scrollbar min-w-0 overflow-y-auto mb-20"
     >
       {/* Video / content area */}
-      <div className="bg-black aspect-video w-full shrink-0 flex items-center justify-center">
-        {currentLesson.lessonType === "video" && currentLesson.videoUrl ? (
+      {currentLesson.lessonType === "video" && currentLesson.videoUrl && (
+        <div className="bg-black aspect-video w-full shrink-0 flex items-center justify-center">
           <div className="w-full h-full">
             <ReactPlayer
               src={currentLesson.videoUrl}
@@ -93,39 +93,43 @@ export default function LectrueContent({
                 console.error("ReactPlayer error:", error);
               }}
             />
+            {/* <VideoPlayer src={currentLesson.videoUrl} /> */}
           </div>
-        ) : (
-          <div className="flex flex-col items-center gap-3 text-white/60">
-            <TypeIcon className="w-10 h-10 opacity-40" strokeWidth={1.2} />
-            <span className="text-sm">{currentLesson.title}</span>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {currentLesson.lessonType === "text" && (
+        <div>{currentLesson.content}</div>
+      )}
 
       {/* Prev / Next nav */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-border/50 bg-background shrink-0">
         {prevLesson ? (
-          <Link
-            href={ROUTES.LESSON(course.id, prevLesson.id)}
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground border border-border/50 px-3 py-1.5 rounded-lg hover:bg-muted/40 hover:text-foreground transition-all"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-            Previous
-          </Link>
+          <Button variant={"secondary"} size="xs" asChild>
+            <Link
+              href={ROUTES.LESSON(course.id, prevLesson.id)}
+              className="inline-flex items-center gap-1.5 text-xs "
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              Previous
+            </Link>
+          </Button>
         ) : (
           <div />
         )}
 
         {nextLesson ? (
-          <Link
-            href={ROUTES.LESSON(course.id, nextLesson.id)}
-            className="inline-flex items-center gap-1.5 text-xs font-medium bg-foreground text-background px-4 py-1.5 rounded-lg hover:opacity-85 transition-opacity"
-          >
-            Complete & Continue
-            <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
+          <Button size="xs" asChild>
+            <Link
+              href={ROUTES.LESSON(course.id, nextLesson.id)}
+              className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-1.5 rounded-lg hover:opacity-85 transition-opacity"
+            >
+              Complete & Continue
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </Button>
         ) : (
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-foreground text-background px-4 py-1.5 rounded-lg opacity-60">
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium px-4 py-1.5 rounded-lg opacity-60">
             Course Complete
           </span>
         )}
@@ -158,7 +162,7 @@ export default function LectrueContent({
 
       {/* Tabs */}
       <div className="flex px-5 border-b border-border/50 shrink-0">
-        {(["overview", "resources", "discussion"] as Tab[]).map((tab) => (
+        {(["overview", "resources"] as Tab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -215,10 +219,6 @@ export default function LectrueContent({
               </a>
             ))}
           </div>
-        )}
-
-        {activeTab === "discussion" && (
-          <p className="text-sm text-muted-foreground">No comments yet.</p>
         )}
       </div>
     </div>

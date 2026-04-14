@@ -77,7 +77,7 @@ export default function CourseContent({
               />
             </div>
             <span className="text-xs font-medium text-foreground w-8 text-right">
-              {Math.round(overallProgress)}%
+              {isNaN(overallProgress) ? 0 : Math.round(overallProgress)}%
             </span>
           </div>
         </div>

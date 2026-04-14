@@ -46,13 +46,18 @@ export default async function LessonPage({ params }: Props) {
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-background">
       {/* ── Sidebar ─────────────────────────────────────────────────── */}
-      <LectureSidebar
-        chapters={chapters}
-        courseId={courseId}
-        currentLessonId={lectureId}
-      />
+      <div className="w-80 shrink-0 border-r border-border/50">
+        <LectureSidebar
+          chapters={chapters}
+          courseId={courseId}
+          currentLessonId={lectureId}
+        />
+      </div>
 
-      <LectrueContent course={courseWithLessons} currentLesson={lesson} />
+      {/* ── Main Content ─────────────────────────────────────────────── */}
+      <div className="flex-1 min-w-0">
+        <LectrueContent course={courseWithLessons} currentLesson={lesson} />
+      </div>
     </div>
   );
 }

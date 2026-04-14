@@ -27,16 +27,13 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
         <AdminSidebar />
         <SidebarInset className="overflow-hidden">
           {/* Header */}
-          <header className="flex items-center justify-between gap-4 px-6 py-3 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shrink-0">
+          <header className="flex items-center justify-between gap-4 px-6 py-1 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shrink-0">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="hover:bg-muted" />
               <div className="hidden md:block">
                 <h1 className="text-lg font-semibold text-foreground">
                   Admin Dashboard
                 </h1>
-                <p className="text-xs text-muted-foreground">
-                  Manage your learning platform
-                </p>
               </div>
             </div>
 

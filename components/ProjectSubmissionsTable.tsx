@@ -113,7 +113,6 @@ export default function ProjectSubmissionsTable({
                   <TableRow>
                     <TableHead>Student</TableHead>
                     <TableHead>Submitted</TableHead>
-                    <TableHead>Status</TableHead>
                     <TableHead>Points</TableHead>
                     <TableHead>Projects</TableHead>
                     <TableHead>Actions</TableHead>

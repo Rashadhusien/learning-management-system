@@ -1,8 +1,3 @@
-import { ROUTES } from "@/constants/routes";
-import { formatDuration } from "@/lib/utils";
-import { FileText } from "lucide-react";
-import Link from "next/link";
-import React from "react";
 import SidebarChapterAccordion from "../cards/SidebarChapterAccordion";
 import { CourseChapter } from "@/types/action";
 

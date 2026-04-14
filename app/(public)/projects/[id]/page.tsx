@@ -47,8 +47,8 @@ const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
           <Link
             href={ROUTES.PROJECTS}
             className="inline-flex items-center gap-2 rounded-full border border-white/20
-                       bg-white/10 backdrop-blur-sm px-4 py-1.5 text-sm text-white
-                       hover:bg-white/20 transition-colors"
+                        bg-white/10 backdrop-blur-sm px-4 py-1.5 text-sm text-white
+                        hover:bg-white/20 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Back to Projects</span>
@@ -91,8 +91,8 @@ const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
                 <div
                   key={label}
                   className="flex flex-col items-center justify-center gap-1.5 rounded-xl
-                             border border-border bg-card px-4 py-5 shadow-xs
-                             hover:border-primary/40 hover:shadow-sm transition-all"
+                              border border-border bg-card px-4 py-5 shadow-xs
+                              hover:border-primary/40 hover:shadow-sm transition-all"
                 >
                   {icon}
                   <span className="small-medium text-muted-foreground">

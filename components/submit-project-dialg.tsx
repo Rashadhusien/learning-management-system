@@ -17,8 +17,8 @@ export default function SubmitProjectDialog() {
         <Button
           size="lg"
           className="w-full gap-2 rounded-xl font-semibold text-base
-                     bg-primary hover:bg-primary/90 text-primary-foreground
-                     shadow-sm transition-all active:scale-[0.98]"
+                  bg-primary hover:bg-primary/90 text-primary-foreground
+                    shadow-sm transition-all active:scale-[0.98]"
         >
           <Upload className="w-4 h-4" />
           Submit Project

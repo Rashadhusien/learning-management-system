@@ -45,6 +45,10 @@ const CourseDetailPage = async ({ params }: CourseDetailPageProps) => {
 
   if (!success || !course) notFound();
 
+  const chaptersWithLessons = chapters?.filter(
+    (chapter) => chapter.lessons?.length > 0,
+  );
+
   return (
     <div className="min-h-screen bg-background">
       {/* ── Hero ────────────────────────────────────────────────── */}
@@ -149,7 +153,7 @@ const CourseDetailPage = async ({ params }: CourseDetailPageProps) => {
 
             <CourseContent
               courseId={id}
-              chapters={chapters}
+              chapters={chaptersWithLessons || []}
               isEnrolled={isEnrolled}
             />
 
@@ -201,7 +205,7 @@ const CourseDetailPage = async ({ params }: CourseDetailPageProps) => {
               {/* CTA */}
               <div className="px-6 py-5">
                 {(await isAdmin()) ? (
-                  <Button className="w-full">
+                  <Button className="w-full" asChild>
                     <Link href={ROUTES.ADMIN_COURSE_DETAILS(id)}>
                       Manage Course
                     </Link>

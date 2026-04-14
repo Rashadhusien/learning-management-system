@@ -28,7 +28,7 @@ export function AdminSidebar() {
   return (
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarHeader className="border-b">
-        <SidebarMenuButton>
+        <SidebarMenuButton size={"sm"}>
           <Link
             href={ROUTES.HOME}
             className="sidebar-collapsed:hidden text-sm font-medium w-full h-full flex gap-2 items-center  hover:bg-muted rounded-md transition-colors"

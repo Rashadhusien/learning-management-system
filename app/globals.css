@@ -392,6 +392,13 @@ code {
   color: inherit !important;
 }
 
+.no-p {
+  padding: 0 !important;
+}
+.no-line {
+  text-decoration: none !important;
+}
+
 [data-lexical-editor="true"] {
   height: 350px !important;
   overflow-y: auto !important;

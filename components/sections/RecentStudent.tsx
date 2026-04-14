@@ -71,21 +71,17 @@ const RecentStudent = ({ students }: { students: User[] }) => {
   );
 
   return (
-    <section ref={sectionRef} className="py-20 bg-muted/30">
+    <section ref={sectionRef} className="py-20 bg-muted/30 ">
       <div className="container mx-auto px-4">
         <SectionTitle
           badge="Community"
-          title={
-            <>
-              Join our <SectionTitleMarker marker="learning" /> community
-            </>
-          }
+          title={<>Join our community</>}
           description="Meet some of our recent students who are on their learning journey."
           badgeIcon={<Users className="w-3 h-3" />}
         />
 
         {/* Student grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 max-w-5xl mx-auto">
           {students?.map((student) => (
             <div key={student.id} className="rs-card">
               <StudentCard student={student} />

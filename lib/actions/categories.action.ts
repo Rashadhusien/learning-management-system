@@ -6,11 +6,12 @@ import { db } from "../db";
 import { categories } from "../schema";
 import { revalidatePath } from "next/cache";
 import handleError from "../handlers/error";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import {
   CreateCategoryParams,
   UpdateCategoryParams,
   Category,
+  ErrorResponse,
 } from "@/types/action.d";
 
 // Create Category
@@ -55,6 +56,25 @@ export async function createCategory(
   }
 }
 
+// Get all Categories
+export async function getRecentCategories(): Promise<
+  ActionResponse<Category[]>
+> {
+  try {
+    const fourCategories = await db
+      .select()
+      .from(categories)
+      .orderBy(desc(categories.createdAt))
+      .limit(4);
+    return {
+      success: true,
+      data: fourCategories as Category[],
+    };
+  } catch (error) {
+    console.error("Error getting categories:", error);
+    return handleError(error) as ErrorResponse;
+  }
+}
 // Get all Categories
 export async function getAllCategories(): Promise<ActionResponse<Category[]>> {
   try {

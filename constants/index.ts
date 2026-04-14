@@ -74,11 +74,6 @@ export const adminLinks = [
     route: ROUTES.ADMIN_ACHIEVEMENTS,
     label: "Achievements",
   },
-  {
-    imgUrl: "/icons/leaderboard.svg",
-    route: ROUTES.ADMIN_LEADERBOARD,
-    label: " Submissions",
-  },
 ];
 
 export const LESSONTYPES = [
